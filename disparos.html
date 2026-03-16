@@ -102,11 +102,12 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
 .kb-drop-zone.active{min-height:40px;border:2px dashed var(--drop-border);background:var(--drop-bg);border-radius:var(--r-sm)}
 
 /* ═══ CARDS ═══ */
-.kb-card{background:var(--card-s);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:grab;transition:all .2s;position:relative;animation:cardIn .25s ease-out}
+.kb-card{background:var(--card-s);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:grab;transition:transform .15s,box-shadow .15s,border-color .15s,opacity .15s;position:relative;animation:cardIn .25s ease-out;user-select:none}
 @keyframes cardIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .kb-card:hover{border-color:var(--border-a);box-shadow:var(--sh)}
-.kb-card:active{cursor:grabbing;transform:scale(.97)}
-.kb-card.dragging{opacity:.3;transform:scale(.95)}
+.kb-card:active{cursor:grabbing}
+.kb-card.dragging{opacity:.25;transform:scale(.92);border-style:dashed;box-shadow:none}
+.kb-card.drag-ghost{position:fixed;z-index:999;pointer-events:none;opacity:.85;transform:rotate(2deg);box-shadow:var(--sh-h);width:280px}
 .kb-card .kc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
 .kb-card .kc-name{font-size:.78rem;font-weight:600;flex:1}
 .kb-card .kc-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s;flex-shrink:0}
@@ -271,6 +272,7 @@ function confirmDialog(title,msg){
 // ═══ STATE ═══
 const boards=[{id:1,nome:'Fran'},{id:2,nome:'Ju'}];
 let currentBoard=1,boardData=null,dragCardId=null,openMoveDropId=null;
+let dragGhost=null,dragSourceColId=null,dragEnterCount={};
 
 // ═══ BOARD TABS ═══
 function renderBoardTabs(){
@@ -299,15 +301,18 @@ function renderKanban(){
     const cards=col.cards||[];
     const colEl=document.createElement('div');colEl.className='kb-col';colEl.dataset.colId=col.id;
 
-    // Drag events on column body
-    colEl.addEventListener('dragover',e=>{e.preventDefault();colEl.classList.add('drag-over')});
-    colEl.addEventListener('dragleave',e=>{if(!colEl.contains(e.relatedTarget))colEl.classList.remove('drag-over')});
+    // Drag events — use enter counter to handle nested elements
+    const cid=col.id;
+    dragEnterCount[cid]=0;
+    colEl.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move'});
+    colEl.addEventListener('dragenter',e=>{e.preventDefault();dragEnterCount[cid]++;colEl.classList.add('drag-over')});
+    colEl.addEventListener('dragleave',()=>{dragEnterCount[cid]--;if(dragEnterCount[cid]<=0){dragEnterCount[cid]=0;colEl.classList.remove('drag-over')}});
     colEl.addEventListener('drop',async e=>{
-      e.preventDefault();colEl.classList.remove('drag-over');
-      if(!dragCardId)return;
+      e.preventDefault();dragEnterCount[cid]=0;colEl.classList.remove('drag-over');
+      if(!dragCardId||dragSourceColId===col.id)return;
       await sb.rpc('kanban_move_card',{p_card_id:dragCardId,p_new_column_id:col.id,p_new_pos:0});
-      dragCardId=null;
       toast('Cliente movido','success');
+      dragCardId=null;dragSourceColId=null;
       await loadBoard(currentBoard);
     });
 
@@ -344,8 +349,20 @@ function renderKanban(){
 
     cards.forEach(card=>{
       const c=document.createElement('div');c.className='kb-card';c.draggable=true;c.dataset.cardId=card.id;
-      c.addEventListener('dragstart',()=>{dragCardId=card.id;c.classList.add('dragging')});
-      c.addEventListener('dragend',()=>{dragCardId=null;c.classList.remove('dragging')});
+      c.addEventListener('dragstart',e=>{
+        dragCardId=card.id;dragSourceColId=col.id;
+        c.classList.add('dragging');
+        // Custom drag image
+        const ghost=c.cloneNode(true);ghost.className='kb-card drag-ghost';ghost.style.width=c.offsetWidth+'px';
+        document.body.appendChild(ghost);
+        e.dataTransfer.setDragImage(ghost,-10,-10);
+        e.dataTransfer.effectAllowed='move';
+        setTimeout(()=>ghost.remove(),0);
+      });
+      c.addEventListener('dragend',()=>{
+        dragCardId=null;dragSourceColId=null;c.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+      });
 
       const loc=card.cidade&&card.estado?card.cidade+'/'+card.estado:'';
       c.innerHTML=
