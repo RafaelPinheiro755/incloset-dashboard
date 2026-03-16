@@ -327,11 +327,10 @@ tbody tr:hover .vh{opacity:1}
         </div>
         <div class="tw glass-s">
           <div class="th-bar"><h2>Aniversariantes de <em id="tMonth">Março</em></h2><span class="tbg" id="tC">-</span></div>
-          <div class="ts"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Cidade/UF</th><th>Aniversário</th><th>Status Envio</th><th></th></tr></thead><tbody id="tB"></tbody></table></div>
+          <div class="ts"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Cidade/UF</th><th>Aniversário</th><th>Enviado em</th><th></th></tr></thead><tbody id="tB"></tbody></table></div>
           <div class="tf">
             <div class="lg">
               <div class="li"><span class="ld" style="background:var(--ok)"></span>Enviado</div>
-              <div class="li"><span class="ld" style="background:var(--fail)"></span>Falha</div>
               <div class="li"><span class="ld" style="background:var(--brown)"></span>Pendente</div>
             </div>
             <div class="ti">Clique para ver detalhes</div>
@@ -341,7 +340,7 @@ tbody tr:hover .vh{opacity:1}
 
       <aside class="side">
         <div class="cd glass"><div class="ct">Status dos <em>envios</em></div>
-          <div class="donut-wrap"><div class="donut"><svg viewBox="0 0 36 36"><circle class="bg-ring" cx="18" cy="18" r="14"/><circle id="dOk" cx="18" cy="18" r="14" stroke="var(--ok)" stroke-dasharray="0 88"/><circle id="dFail" cx="18" cy="18" r="14" stroke="var(--fail)" stroke-dasharray="0 88"/><circle id="dPend" cx="18" cy="18" r="14" stroke="var(--brown)" stroke-dasharray="0 88"/></svg><div class="donut-center"><strong id="dTotal">-</strong><small>Total</small></div></div><div class="donut-legend" id="dLeg"></div></div>
+          <div class="donut-wrap"><div class="donut"><svg viewBox="0 0 36 36"><circle class="bg-ring" cx="18" cy="18" r="14"/><circle id="dOk" cx="18" cy="18" r="14" stroke="var(--ok)" stroke-dasharray="0 88"/><circle id="dPend" cx="18" cy="18" r="14" stroke="var(--brown)" stroke-dasharray="0 88"/></svg><div class="donut-center"><strong id="dTotal">-</strong><small>Total</small></div></div><div class="donut-legend" id="dLeg"></div></div>
         </div>
 
         <div class="cd glass"><div class="ct">Envios dos <em>últimos 7 dias</em></div><div class="bars" id="cB"></div><div class="cs">Total: <strong id="cT">0</strong></div></div>
@@ -375,7 +374,7 @@ tbody tr:hover .vh{opacity:1}
     <div class="mdl-i"><label>Vendedora</label><span id="mVen"></span></div>
     <div class="mdl-i"><label>Cliente Desde</label><span id="mDes"></span></div>
     <div class="mdl-i"><label>Tipo</label><span id="mTip"></span></div>
-    <div class="mdl-i"><label>Status Envio</label><span id="mSt"></span></div>
+    <div class="mdl-i"><label>Enviado em</label><span id="mSt"></span></div>
   </div>
 </div></div></div>
 
@@ -440,7 +439,7 @@ async function loadData(){
 // ═══ METRICS ═══
 function renderMetrics(){
   document.getElementById('m1').textContent=stats.envios_hoje||0;
-  document.getElementById('m1s').textContent=(stats.envios_falha||0)>0?stats.envios_falha+' falha(s)':'Nenhuma falha';
+  document.getElementById('m1s').textContent='disparos hoje';
   document.getElementById('m2').textContent=stats.envios_mes||0;
   document.getElementById('m2s').textContent=curMP+' 2026';
   document.getElementById('m3').textContent=monthContacts.length;
@@ -470,14 +469,13 @@ function renderTable(){
   tC.textContent=data.length+' registro'+(data.length!==1?'s':'');
   data.forEach(c=>{
     const col=rc(c.nome),envio=c._envio;
-    let stH;
-    if(envio)stH='<span class="st st-'+envio.status+'">'+(envio.status==='enviado'?'Enviado':'Falha')+'</span>';
-    else stH='<span class="st st-pendente">'+(c.dia_nasc<todayDay?'Não enviado':'Pendente')+'</span>';
     const isT=c.dia_nasc===todayDay;
     const bd=c.dia_nasc+'/'+(now.getMonth()+1).toString().padStart(2,'0')+(isT?' (HOJE)':'');
     const cid=c.cidade&&c.estado?c.cidade+'/'+c.estado:(c.estado||'-');
+    let envioInfo='-';
+    if(envio){const d=new Date(envio.enviado_em);envioInfo=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
     const tr=document.createElement('tr');
-    tr.innerHTML='<td><div class="nc"><div class="nca" style="background:'+col+'12;color:'+col+'">'+ini(c._titleName)+'</div><span class="ncn">'+c._titleName+'</span></div></td><td class="ph">'+c.telefone+'</td><td class="tc">'+cid+'</td><td>'+(isT?'<strong style="color:var(--wine)">'+bd+'</strong>':bd)+'</td><td>'+stH+'</td><td><span class="vh">Ver &#8250;</span></td>';
+    tr.innerHTML='<td><div class="nc"><div class="nca" style="background:'+col+'12;color:'+col+'">'+ini(c._titleName)+'</div><span class="ncn">'+c._titleName+'</span></div></td><td class="ph">'+c.telefone+'</td><td class="tc">'+cid+'</td><td>'+(isT?'<strong style="color:var(--wine)">'+bd+'</strong>':bd)+'</td><td class="tc">'+envioInfo+'</td><td><span class="vh">Ver &#8250;</span></td>';
     tr.addEventListener('click',()=>openModal(c));tB.appendChild(tr);
   });
 }
@@ -495,9 +493,9 @@ function renderChart(){
 
 // ═══ DONUT ═══
 function renderDonut(){
-  const tot=monthContacts.length,env=monthContacts.filter(c=>c._envio&&c._envio.status==='enviado').length,fal=monthContacts.filter(c=>c._envio&&c._envio.status==='falha').length,pen=tot-env-fal;
+  const tot=monthContacts.length,env=monthContacts.filter(c=>c._envio).length,pen=tot-env;
   document.getElementById('dTotal').textContent=tot;const circ=2*Math.PI*14;
-  const segs=[{id:'dOk',n:env,l:'Enviado',c:'var(--ok)'},{id:'dFail',n:fal,l:'Falha',c:'var(--fail)'},{id:'dPend',n:pen,l:'Pendente',c:'var(--brown)'}];
+  const segs=[{id:'dOk',n:env,l:'Enviado',c:'var(--ok)'},{id:'dPend',n:pen,l:'Pendente',c:'var(--brown)'}];
   let off=0;segs.forEach(s=>{const p=tot>0?s.n/tot*100:0;const d=(p/100)*circ;document.getElementById(s.id).setAttribute('stroke-dasharray',d+' '+(circ-d));document.getElementById(s.id).setAttribute('stroke-dashoffset',(-off/100*circ)+'');off+=p});
   const leg=document.getElementById('dLeg');leg.innerHTML='';
   segs.forEach(s=>{const d=document.createElement('div');d.className='dl-item';d.innerHTML='<span class="dl-dot" style="background:'+s.c+'"></span>'+s.l+'<strong>'+s.n+'</strong>';leg.appendChild(d)});
@@ -509,7 +507,7 @@ function renderActivity(acts){
   if(!acts.length){l.innerHTML='<div class="empty"><p>Nenhuma atividade ainda</p></div>';return}
   l.innerHTML='';l.className='act-list';
   acts.forEach(a=>{const d=new Date(a.enviado_em);const t=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const div=document.createElement('div');div.className='act';div.innerHTML='<div class="act-dot a-'+a.status+'"></div><div class="act-info"><div class="act-msg"><strong>'+titleCase(a.nome)+'</strong> — '+(a.status==='enviado'?'mensagem enviada':'falha no envio')+'</div><div class="act-time">'+t+'</div></div>';l.appendChild(div)});
+    const div=document.createElement('div');div.className='act';div.innerHTML='<div class="act-dot a-enviado"></div><div class="act-info"><div class="act-msg"><strong>'+titleCase(a.nome)+'</strong> — mensagem enviada</div><div class="act-time">'+t+'</div></div>';l.appendChild(div)});
 }
 
 // ═══ UPCOMING ═══
@@ -619,8 +617,8 @@ function openModal(c){
   document.getElementById('mVen').textContent=c.vendedor?titleCase(c.vendedor):'-';
   document.getElementById('mDes').textContent=c.cliente_desde?new Date(c.cliente_desde).toLocaleDateString('pt-BR'):'-';
   document.getElementById('mTip').textContent=(c.tipo_pessoa||'-')+(c.tipo_contato?' — '+c.tipo_contato:'');
-  if(c._envio){const st=c._envio.status;document.getElementById('mSt').innerHTML='<span class="st st-'+st+'">'+(st==='enviado'?'Enviado':'Falha')+'</span>'}
-  else document.getElementById('mSt').innerHTML='<span class="st st-pendente">Pendente</span>';
+  if(c._envio){const d=new Date(c._envio.enviado_em);document.getElementById('mSt').textContent=d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+  else document.getElementById('mSt').textContent='Pendente';
   ov.classList.add('on');document.body.style.overflow='hidden';
 }
 function closeM(){ov.classList.remove('on');document.body.style.overflow=''}
