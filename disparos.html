@@ -10,132 +10,195 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root,[data-theme="light"]{
-  --card:rgba(255,255,255,0.72);--card-s:rgba(255,255,255,0.88);
+  --card:rgba(255,255,255,0.78);--card-s:rgba(255,255,255,0.92);
   --surface:rgba(237,230,222,0.65);--surface-w:rgba(230,220,210,0.75);
   --border:rgba(155,122,90,0.16);--border-a:rgba(155,122,90,0.30);
   --txt:#3D2E25;--txt2:#6E5D52;--txt3:#9B8E84;
   --brown:#9B7A5A;--brown-s:rgba(155,122,90,0.10);
   --rose:#C48D8D;--wine:#8B3A5A;--wine-s:rgba(139,58,90,0.10);
   --blush:#E0C0B8;--champ:#D8C8B8;--gold:#A88550;
-  --ok:#7AAE8E;--fail:#B85C5C;
-  --page-bg:#E5DDD5;
-  --hdr-bg:rgba(255,255,255,0.65);
+  --ok:#7AAE8E;--ok-s:rgba(122,174,142,0.10);--fail:#B85C5C;--fail-s:rgba(184,92,92,0.10);
+  --page-bg:#E5DDD5;--hdr-bg:rgba(255,255,255,0.65);
   --bg-ov-top:rgba(229,221,213,0.30);--bg-ov-mid:rgba(229,221,213,0.62);--bg-ov-bot:rgba(229,221,213,0.88);
-  --col-bg:rgba(245,239,232,0.7);
+  --col-bg:rgba(245,239,232,0.75);--col-head:rgba(240,233,225,0.6);
+  --drop-bg:rgba(155,122,90,0.06);--drop-border:rgba(155,122,90,0.25);
   --r-sm:10px;--r-md:14px;--r-lg:20px;--r-pill:50px;
-  --sh:0 4px 24px rgba(60,40,20,0.10),0 1px 4px rgba(60,40,20,0.06);
+  --sh:0 4px 24px rgba(60,40,20,0.08),0 1px 4px rgba(60,40,20,0.04);
+  --sh-h:0 8px 32px rgba(60,40,20,0.12),0 2px 6px rgba(60,40,20,0.05);
   --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',-apple-system,sans-serif;
 }
 
 [data-theme="dark"]{
-  --card:rgba(30,26,22,0.80);--card-s:rgba(35,30,26,0.90);
+  --card:rgba(38,32,28,0.85);--card-s:rgba(45,38,32,0.92);
   --surface:rgba(50,42,35,0.70);--surface-w:rgba(60,50,42,0.80);
-  --border:rgba(155,122,90,0.20);--border-a:rgba(155,122,90,0.35);
+  --border:rgba(180,150,110,0.15);--border-a:rgba(180,150,110,0.28);
   --txt:#E8E0D8;--txt2:#B8A898;--txt3:#7A6E62;
-  --brown:#C4A070;--brown-s:rgba(196,160,112,0.12);
-  --rose:#D4A0A0;--wine:#C47090;--wine-s:rgba(196,112,144,0.12);
-  --blush:#8B6060;--champ:#6B5A4A;--gold:#C4A060;
-  --ok:#80C8A0;--fail:#D08080;
-  --page-bg:#1A1614;
-  --hdr-bg:rgba(26,22,20,0.80);
-  --bg-ov-top:rgba(26,22,20,0.40);--bg-ov-mid:rgba(26,22,20,0.70);--bg-ov-bot:rgba(26,22,20,0.92);
-  --col-bg:rgba(40,35,30,0.7);
+  --brown:#D4B080;--brown-s:rgba(212,176,128,0.10);
+  --rose:#D4A0A0;--wine:#D08090;--wine-s:rgba(208,128,144,0.12);
+  --blush:#8B6060;--champ:#6B5A4A;--gold:#D4B060;
+  --ok:#90D0A8;--ok-s:rgba(144,208,168,0.10);--fail:#E09090;--fail-s:rgba(224,144,144,0.10);
+  --page-bg:#141210;--hdr-bg:rgba(20,18,16,0.85);
+  --bg-ov-top:rgba(20,18,16,0.50);--bg-ov-mid:rgba(20,18,16,0.78);--bg-ov-bot:rgba(20,18,16,0.92);
+  --col-bg:rgba(32,28,24,0.80);--col-head:rgba(40,35,30,0.6);
+  --drop-bg:rgba(212,176,128,0.06);--drop-border:rgba(212,176,128,0.2);
 }
 
 html{scroll-behavior:smooth}
-body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:var(--page-bg);transition:background .3s,color .3s}
+body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:var(--page-bg);transition:background .4s,color .4s}
 
 .bg{position:fixed;inset:0;z-index:0;background:url('https://images.tcdn.com.br/img/img_prod/1338516/69988d827e0c2_bannerteste.png') center center/cover no-repeat}
-.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(1.5px);transition:background .3s}
-.app{position:relative;z-index:2}
+.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(2px);transition:background .4s}
+.app{position:relative;z-index:2;display:flex;flex-direction:column;min-height:100vh}
 
-/* HEADER */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:68px;background:var(--hdr-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;transition:background .3s}
-.hdr-l{display:flex;align-items:center;gap:14px}
-.logo{width:42px;height:42px;background:linear-gradient(145deg,#EDE0D6,#DBC8BB);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(155,122,90,0.2);flex-shrink:0;text-decoration:none}
-.logo span{font-family:var(--fd);font-style:italic;font-size:.6rem;color:#6B4F3A;line-height:1.05;text-align:center}
-.brand h1{font-family:var(--fd);font-size:1.35rem;font-weight:400;line-height:1.15}
+/* ═══ HEADER ═══ */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;background:var(--hdr-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;transition:background .4s}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;background:linear-gradient(145deg,#EDE0D6,#DBC8BB);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(155,122,90,0.18);flex-shrink:0;text-decoration:none;transition:transform .2s}
+.logo:hover{transform:scale(1.06)}
+.logo span{font-family:var(--fd);font-style:italic;font-size:.55rem;color:#6B4F3A;line-height:1.05;text-align:center}
+.brand h1{font-family:var(--fd);font-size:1.25rem;font-weight:400;line-height:1.15}
 .brand h1 em{font-style:italic;font-weight:300;color:var(--brown)}
-.brand small{font-size:.64rem;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
-.hdr-r{display:flex;align-items:center;gap:10px}
-
-/* Nav */
-.nav-links{display:flex;gap:4px;background:var(--surface);border-radius:var(--r-pill);padding:3px;border:1px solid var(--border)}
-.nav-link{padding:7px 18px;border-radius:var(--r-pill);text-decoration:none;font-size:.78rem;font-weight:500;color:var(--txt3);transition:all .2s}
+.brand small{font-size:.6rem;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:3px;background:var(--surface);border-radius:var(--r-pill);padding:3px;border:1px solid var(--border);transition:background .4s,border-color .4s}
+.nav-link{padding:6px 16px;border-radius:var(--r-pill);text-decoration:none;font-size:.76rem;font-weight:500;color:var(--txt3);transition:all .2s}
 .nav-link:hover{color:var(--txt2)}
-.nav-link.active{background:var(--card);color:var(--brown);font-weight:600;box-shadow:0 1px 6px rgba(60,40,20,0.06)}
-
-.theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .3s;line-height:1}
+.nav-link.active{background:var(--card);color:var(--brown);font-weight:600;box-shadow:0 1px 4px rgba(60,40,20,0.06)}
+.theme-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;transition:all .3s;line-height:1}
 .theme-btn:hover{border-color:var(--border-a);transform:scale(1.1) rotate(15deg)}
 
-/* MAIN */
-.main{padding:24px 30px;max-width:100%}
+/* ═══ MAIN ═══ */
+.main{flex:1;padding:20px 28px;display:flex;flex-direction:column;overflow:hidden}
 
 /* Board tabs */
-.board-tabs{display:flex;gap:8px;margin-bottom:20px;align-items:center}
-.board-tab{padding:10px 24px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);font-family:var(--fd);font-size:1.1rem;font-weight:500;color:var(--txt3);cursor:pointer;transition:all .2s}
+.board-tabs{display:flex;gap:6px;margin-bottom:16px;align-items:center;flex-shrink:0}
+.board-tab{padding:9px 22px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);font-family:var(--fd);font-size:1.05rem;font-weight:500;color:var(--txt3);cursor:pointer;transition:all .25s}
 .board-tab:hover{border-color:var(--border-a);color:var(--txt2)}
 .board-tab.active{border-color:var(--brown);color:var(--brown);background:var(--card-s);box-shadow:var(--sh)}
 .board-tab em{font-style:italic;font-weight:400}
 
-/* Kanban */
-.kanban{display:flex;gap:14px;overflow-x:auto;padding-bottom:20px;align-items:flex-start;min-height:calc(100vh - 200px)}
+/* ═══ KANBAN ═══ */
+.kanban{display:flex;gap:12px;overflow-x:auto;flex:1;align-items:stretch;padding-bottom:12px}
+.kanban::-webkit-scrollbar{height:6px}
 
-.kb-col{min-width:280px;max-width:320px;flex-shrink:0;border-radius:var(--r-md);background:var(--col-bg);backdrop-filter:blur(12px);border:1px solid var(--border);display:flex;flex-direction:column;transition:background .3s}
-.kb-col.drag-over{border-color:var(--brown);box-shadow:0 0 0 2px var(--brown-s)}
+/* Column */
+.kb-col{width:300px;min-width:300px;flex-shrink:0;border-radius:var(--r-md);background:var(--col-bg);backdrop-filter:blur(12px);border:1px solid var(--border);display:flex;flex-direction:column;transition:all .3s;max-height:calc(100vh - 180px)}
+.kb-col.drag-over{border-color:var(--brown);background:var(--drop-bg)}
 
-.kb-col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);gap:8px}
-.kb-col-title{font-size:.82rem;font-weight:600;flex:1;min-width:0}
-.kb-col-count{font-size:.62rem;color:var(--txt3);background:var(--surface);padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
-.kb-col-menu{display:flex;gap:2px}
-.kb-col-btn{width:26px;height:26px;border-radius:6px;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.kb-col-btn:hover{background:var(--surface);color:var(--txt)}
+.kb-col-head{display:flex;align-items:center;padding:10px 12px;gap:8px;background:var(--col-head);border-radius:var(--r-md) var(--r-md) 0 0;border-bottom:1px solid var(--border);flex-shrink:0;transition:background .4s}
+.col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kb-col-title{font-size:.8rem;font-weight:600;flex:1;min-width:0;cursor:text;padding:2px 4px;border-radius:4px;border:1px solid transparent;transition:border-color .15s}
+.kb-col-title:hover{border-color:var(--border)}
+.kb-col-title:focus{outline:none;border-color:var(--brown);background:var(--card)}
+.kb-col-count{font-size:.6rem;color:var(--txt3);background:var(--surface);padding:2px 7px;border-radius:8px;font-weight:600;flex-shrink:0;transition:background .4s}
+.kb-col-del{width:22px;height:22px;border-radius:5px;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.62rem;display:flex;align-items:center;justify-content:center;transition:all .15s;opacity:0}
+.kb-col-head:hover .kb-col-del{opacity:1}
+.kb-col-del:hover{background:var(--fail-s);color:var(--fail)}
 
-.kb-col-body{padding:8px;flex:1;min-height:60px;display:flex;flex-direction:column;gap:6px}
+.kb-col-body{padding:6px 8px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
 
-/* Cards */
-.kb-card{background:var(--card-s);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:grab;transition:all .15s;position:relative}
+/* Drop placeholder */
+.kb-drop-zone{min-height:4px;border-radius:4px;transition:all .2s}
+.kb-drop-zone.active{min-height:40px;border:2px dashed var(--drop-border);background:var(--drop-bg);border-radius:var(--r-sm)}
+
+/* ═══ CARDS ═══ */
+.kb-card{background:var(--card-s);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:grab;transition:all .2s;position:relative;animation:cardIn .25s ease-out}
+@keyframes cardIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .kb-card:hover{border-color:var(--border-a);box-shadow:var(--sh)}
-.kb-card:active{cursor:grabbing;opacity:.8;transform:scale(.98)}
-.kb-card.dragging{opacity:.4;border-style:dashed}
-.kb-card .kc-name{font-size:.78rem;font-weight:600;margin-bottom:2px}
-.kb-card .kc-info{font-size:.64rem;color:var(--txt3)}
-.kb-card .kc-nota{font-size:.66rem;color:var(--txt2);margin-top:4px;font-style:italic;border-top:1px solid var(--border);padding-top:4px}
-.kb-card .kc-del{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.6rem;display:none;align-items:center;justify-content:center;transition:all .15s}
-.kb-card:hover .kc-del{display:flex}
-.kb-card .kc-del:hover{background:rgba(184,92,92,0.1);color:var(--fail)}
+.kb-card:active{cursor:grabbing;transform:scale(.97)}
+.kb-card.dragging{opacity:.3;transform:scale(.95)}
+.kb-card .kc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.kb-card .kc-name{font-size:.78rem;font-weight:600;flex:1}
+.kb-card .kc-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s;flex-shrink:0}
+.kb-card:hover .kc-actions{opacity:1}
+.kc-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.kc-btn:hover{background:var(--surface-w);color:var(--txt)}
+.kc-btn.del:hover{background:var(--fail-s);color:var(--fail)}
+.kb-card .kc-info{font-size:.66rem;color:var(--txt3);margin-top:2px}
+.kb-card .kc-nota{font-size:.66rem;color:var(--txt2);margin-top:5px;padding-top:5px;border-top:1px solid var(--border);font-style:italic}
 
-/* Add card */
-.kb-add-card{padding:8px 12px;border-radius:var(--r-sm);border:1px dashed var(--border);background:transparent;color:var(--txt3);font-family:var(--fb);font-size:.74rem;cursor:pointer;transition:all .15s;text-align:left;width:100%}
-.kb-add-card:hover{border-color:var(--brown);color:var(--brown);background:var(--brown-s)}
+/* Move dropdown */
+.move-drop{position:absolute;right:0;top:100%;margin-top:4px;background:var(--card-s);backdrop-filter:blur(16px);border:1px solid var(--border-a);border-radius:var(--r-sm);box-shadow:var(--sh-h);z-index:30;min-width:160px;padding:4px;animation:dropIn .15s ease-out}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.move-drop-item{padding:7px 10px;font-size:.72rem;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .1s}
+.move-drop-item:hover{background:var(--brown-s)}
+.move-drop-item .md-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.move-drop-title{padding:5px 10px;font-size:.6rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 
-/* Add column */
-.kb-add-col{min-width:280px;max-width:320px;flex-shrink:0;border-radius:var(--r-md);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;padding:40px 20px;cursor:pointer;color:var(--txt3);font-size:.82rem;transition:all .2s;background:transparent}
+/* ═══ ADD CARD ═══ */
+.kb-add-wrap{flex-shrink:0;padding:4px 8px 8px}
+.kb-add-btn{padding:7px 10px;border-radius:var(--r-sm);border:1px dashed var(--border);background:transparent;color:var(--txt3);font-family:var(--fb);font-size:.73rem;cursor:pointer;transition:all .15s;text-align:left;width:100%;display:flex;align-items:center;gap:5px}
+.kb-add-btn:hover{border-color:var(--brown);color:var(--brown);background:var(--brown-s)}
+.kb-add-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Search inline */
+.search-inline{animation:cardIn .2s ease-out}
+.search-inline input{width:100%;padding:8px 10px;border:1px solid var(--brown);border-radius:var(--r-sm);background:var(--card);color:var(--txt);font-family:var(--fb);font-size:.78rem;outline:none;box-shadow:0 0 0 3px var(--brown-s);transition:all .2s}
+.search-inline input::placeholder{color:var(--txt3)}
+.search-inline .sr-list{margin-top:4px;background:var(--card-s);border:1px solid var(--border);border-radius:var(--r-sm);max-height:200px;overflow-y:auto;box-shadow:var(--sh)}
+.search-inline .sr-item{padding:8px 10px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.search-inline .sr-item:last-child{border-bottom:none}
+.search-inline .sr-item:hover{background:var(--brown-s)}
+.search-inline .sr-item.sel{background:var(--brown-s)}
+.sr-av{width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:600;font-family:var(--fd);flex-shrink:0}
+.sr-info{flex:1;min-width:0}
+.sr-name{font-size:.76rem;font-weight:600}
+.sr-meta{font-size:.62rem;color:var(--txt3)}
+.sr-hint{padding:10px;font-size:.7rem;color:var(--txt3);text-align:center;font-style:italic}
+.sr-cancel{padding:7px;border-radius:var(--r-sm);border:none;background:var(--surface);color:var(--txt3);font-family:var(--fb);font-size:.7rem;cursor:pointer;width:100%;margin-top:4px;transition:all .15s}
+.sr-cancel:hover{background:var(--surface-w);color:var(--txt)}
+
+/* ═══ ADD COLUMN ═══ */
+.kb-add-col{width:300px;min-width:300px;flex-shrink:0;border-radius:var(--r-md);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;cursor:pointer;color:var(--txt3);font-size:.82rem;transition:all .25s;background:transparent;gap:8px}
 .kb-add-col:hover{border-color:var(--brown);color:var(--brown);background:var(--brown-s)}
+.kb-add-col svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5}
 
-/* Search dropdown */
-.search-drop{position:relative}
-.search-drop input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--txt);font-family:var(--fb);font-size:.76rem;outline:none;transition:border-color .15s}
-.search-drop input:focus{border-color:var(--brown)}
-.search-drop input::placeholder{color:var(--txt3)}
-.search-results{position:absolute;top:100%;left:0;right:0;background:var(--card-s);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:0 0 var(--r-sm) var(--r-sm);max-height:180px;overflow-y:auto;z-index:20;display:none}
-.search-results.show{display:block}
-.search-result{padding:8px 10px;font-size:.74rem;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
-.search-result:hover{background:var(--brown-s)}
-.search-result:last-child{border-bottom:none}
-.search-result .sr-name{font-weight:600}
-.search-result .sr-info{font-size:.64rem;color:var(--txt3)}
+/* Inline add column */
+.kb-new-col{width:300px;min-width:300px;flex-shrink:0;border-radius:var(--r-md);background:var(--col-bg);backdrop-filter:blur(12px);border:1px solid var(--brown);padding:14px;animation:cardIn .2s ease-out}
+.kb-new-col input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--txt);font-family:var(--fb);font-size:.82rem;outline:none;margin-bottom:8px;transition:border-color .15s}
+.kb-new-col input:focus{border-color:var(--brown)}
+.kb-new-col input::placeholder{color:var(--txt3)}
+.kb-new-col .nc-btns{display:flex;gap:6px}
+.nc-btn{flex:1;padding:8px;border-radius:var(--r-sm);border:none;font-family:var(--fb);font-size:.76rem;font-weight:500;cursor:pointer;transition:all .15s}
+.nc-btn.primary{background:var(--brown);color:#fff}
+.nc-btn.primary:hover{opacity:.85}
+.nc-btn.secondary{background:var(--surface);color:var(--txt3)}
+.nc-btn.secondary:hover{background:var(--surface-w);color:var(--txt)}
 
-/* Color dot on column header */
-.col-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* ═══ TOAST ═══ */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--r-sm);font-size:.78rem;font-weight:500;box-shadow:var(--sh-h);animation:toastIn .3s ease-out;display:flex;align-items:center;gap:8px;backdrop-filter:blur(12px)}
+.toast.success{background:var(--ok-s);color:var(--ok);border:1px solid var(--ok)}
+.toast.info{background:var(--brown-s);color:var(--brown);border:1px solid var(--brown)}
+.toast.error{background:var(--fail-s);color:var(--fail);border:1px solid var(--fail)}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
+
+/* ═══ CONFIRM DIALOG ═══ */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(3px);z-index:150;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.confirm-box{background:var(--card-s);backdrop-filter:blur(20px);border:1px solid var(--border-a);border-radius:var(--r-lg);padding:24px;max-width:360px;width:90%;box-shadow:var(--sh-h);animation:cardIn .2s ease-out}
+.confirm-box h3{font-family:var(--fd);font-size:1.1rem;font-weight:500;margin-bottom:8px}
+.confirm-box p{font-size:.82rem;color:var(--txt2);margin-bottom:18px;line-height:1.5}
+.confirm-box .cb-btns{display:flex;gap:8px;justify-content:flex-end}
+.confirm-box .cb-btn{padding:8px 18px;border-radius:var(--r-sm);border:none;font-family:var(--fb);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .15s}
+.confirm-box .cb-cancel{background:var(--surface);color:var(--txt3)}
+.confirm-box .cb-cancel:hover{background:var(--surface-w);color:var(--txt)}
+.confirm-box .cb-danger{background:var(--fail);color:#fff}
+.confirm-box .cb-danger:hover{opacity:.85}
+
+/* Loading */
+.loading-cols{display:flex;gap:12px}
+.loading-col{width:300px;min-width:300px;height:300px;border-radius:var(--r-md);background:var(--col-bg);border:1px solid var(--border);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 
 /* Responsive */
 @media(max-width:768px){
-  .hdr{padding:0 16px;height:60px}
-  .main{padding:16px 12px}
-  .kanban{gap:10px}
-  .kb-col,.kb-add-col{min-width:260px}
+  .hdr{padding:0 16px;height:56px}
+  .main{padding:12px}
+  .kb-col,.kb-add-col,.kb-new-col{width:280px;min-width:280px}
   .nav-links{display:none}
+  .brand small{display:none}
 }
 
 ::-webkit-scrollbar{width:4px;height:6px}
@@ -155,7 +218,7 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
     </div>
     <div class="hdr-r">
       <nav class="nav-links">
-        <a href="index.html" class="nav-link">Aniversários</a>
+        <a href="index.html" class="nav-link">Aniversarios</a>
         <a href="disparos.html" class="nav-link active">Disparos</a>
       </nav>
       <button class="theme-btn" id="themeBtn">&#9789;</button>
@@ -164,215 +227,273 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
 
   <main class="main">
     <div class="board-tabs" id="boardTabs"></div>
-    <div class="kanban" id="kanban"></div>
+    <div class="kanban" id="kanban">
+      <div class="loading-cols"><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div></div>
+    </div>
   </main>
 </div>
 
-<script>
-const sb = supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+<div class="toast-container" id="toasts"></div>
 
+<script>
+const sb=supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+
+const COLS_CACHE=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A','#7A9080','#B07060'];
 function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+function ini(n){const p=n.split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()}
+function randCol(){return COLS_CACHE[Math.floor(Math.random()*COLS_CACHE.length)]}
 
 // ═══ THEME ═══
 const themeBtn=document.getElementById('themeBtn');
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.innerHTML=t==='dark'?'&#9788;':'&#9789;';localStorage.setItem('incloset-theme',t)}
-themeBtn.addEventListener('click',()=>{const c=document.documentElement.getAttribute('data-theme');setTheme(c==='dark'?'light':'dark')});
-const saved=localStorage.getItem('incloset-theme');if(saved)setTheme(saved);
+themeBtn.addEventListener('click',()=>{setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+if(localStorage.getItem('incloset-theme'))setTheme(localStorage.getItem('incloset-theme'));
 
-// ═══ STATE ═══
-let boards=[];
-let currentBoard=1;
-let boardData=null;
-let dragCard=null;
-
-// ═══ LOAD BOARDS ═══
-async function loadBoards(){
-  // We know boards are id=1 (Fran) and id=2 (Ju) from the migration
-  boards=[{id:1,nome:'Fran'},{id:2,nome:'Ju'}];
-  renderBoardTabs();
-  await loadBoard(currentBoard);
+// ═══ TOAST ═══
+function toast(msg,type='info'){
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.animation='toastOut .3s forwards';setTimeout(()=>t.remove(),300)},2500);
 }
 
+// ═══ CONFIRM DIALOG ═══
+function confirmDialog(title,msg){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');ov.className='confirm-overlay';
+    ov.innerHTML='<div class="confirm-box"><h3>'+title+'</h3><p>'+msg+'</p><div class="cb-btns"><button class="cb-btn cb-cancel">Cancelar</button><button class="cb-btn cb-danger">Confirmar</button></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('.cb-cancel').addEventListener('click',()=>{ov.remove();resolve(false)});
+    ov.querySelector('.cb-danger').addEventListener('click',()=>{ov.remove();resolve(true)});
+    ov.addEventListener('click',e=>{if(e.target===ov){ov.remove();resolve(false)}});
+  });
+}
+
+// ═══ STATE ═══
+const boards=[{id:1,nome:'Fran'},{id:2,nome:'Ju'}];
+let currentBoard=1,boardData=null,dragCardId=null,openMoveDropId=null;
+
+// ═══ BOARD TABS ═══
 function renderBoardTabs(){
-  const el=document.getElementById('boardTabs');
-  el.innerHTML='';
+  const el=document.getElementById('boardTabs');el.innerHTML='';
   boards.forEach(b=>{
     const btn=document.createElement('button');
     btn.className='board-tab'+(b.id===currentBoard?' active':'');
     btn.innerHTML='Disparos <em>'+b.nome+'</em>';
-    btn.addEventListener('click',()=>{currentBoard=b.id;renderBoardTabs();loadBoard(b.id)});
+    btn.addEventListener('click',()=>{if(b.id===currentBoard)return;currentBoard=b.id;renderBoardTabs();loadBoard(b.id)});
     el.appendChild(btn);
   });
 }
 
-// ═══ LOAD BOARD DATA ═══
-async function loadBoard(boardId){
-  const {data}=await sb.rpc('kanban_get_board',{p_board_id:boardId});
-  boardData=data;
-  renderKanban();
+// ═══ LOAD BOARD ═══
+async function loadBoard(id){
+  const{data}=await sb.rpc('kanban_get_board',{p_board_id:id});
+  boardData=data;renderKanban();
 }
 
 // ═══ RENDER KANBAN ═══
 function renderKanban(){
-  const el=document.getElementById('kanban');
-  el.innerHTML='';
-  if(!boardData||!boardData.columns){el.innerHTML='<p style="color:var(--txt3)">Nenhuma coluna</p>';return}
+  const el=document.getElementById('kanban');el.innerHTML='';
+  if(!boardData||!boardData.columns)return;
 
   boardData.columns.forEach(col=>{
-    const colEl=document.createElement('div');
-    colEl.className='kb-col';
-    colEl.dataset.colId=col.id;
+    const cards=col.cards||[];
+    const colEl=document.createElement('div');colEl.className='kb-col';colEl.dataset.colId=col.id;
 
-    // Drop zone
+    // Drag events on column body
     colEl.addEventListener('dragover',e=>{e.preventDefault();colEl.classList.add('drag-over')});
-    colEl.addEventListener('dragleave',()=>colEl.classList.remove('drag-over'));
+    colEl.addEventListener('dragleave',e=>{if(!colEl.contains(e.relatedTarget))colEl.classList.remove('drag-over')});
     colEl.addEventListener('drop',async e=>{
       e.preventDefault();colEl.classList.remove('drag-over');
-      if(!dragCard)return;
-      const cardId=parseInt(dragCard);
-      const newColId=col.id;
-      await sb.rpc('kanban_move_card',{p_card_id:cardId,p_new_column_id:newColId,p_new_pos:0});
+      if(!dragCardId)return;
+      await sb.rpc('kanban_move_card',{p_card_id:dragCardId,p_new_column_id:col.id,p_new_pos:0});
+      dragCardId=null;
+      toast('Cliente movido','success');
       await loadBoard(currentBoard);
     });
 
-    const cards=col.cards||[];
+    // Column header
+    const head=document.createElement('div');head.className='kb-col-head';
+    head.innerHTML='<div class="col-dot" style="background:'+col.cor+'"></div><span class="kb-col-title" contenteditable="true" spellcheck="false">'+col.nome+'</span><span class="kb-col-count">'+cards.length+'</span><button class="kb-col-del" title="Excluir coluna">&#10005;</button>';
 
-    colEl.innerHTML=
-      '<div class="kb-col-head">'+
-        '<div class="col-dot" style="background:'+col.cor+'"></div>'+
-        '<span class="kb-col-title">'+col.nome+'</span>'+
-        '<span class="kb-col-count">'+cards.length+'</span>'+
-        '<div class="kb-col-menu">'+
-          '<button class="kb-col-btn" title="Renomear" data-action="rename" data-col="'+col.id+'">&#9998;</button>'+
-          '<button class="kb-col-btn" title="Excluir coluna" data-action="delcol" data-col="'+col.id+'" style="color:var(--fail)">&#10005;</button>'+
-        '</div>'+
-      '</div>'+
-      '<div class="kb-col-body" data-col-body="'+col.id+'"></div>';
+    // Inline rename
+    const titleEl=head.querySelector('.kb-col-title');
+    let origName=col.nome;
+    titleEl.addEventListener('focus',()=>{origName=titleEl.textContent});
+    titleEl.addEventListener('blur',async()=>{
+      const newName=titleEl.textContent.trim();
+      if(newName&&newName!==origName){
+        await sb.rpc('kanban_rename_column',{p_column_id:col.id,p_nome:newName});
+        toast('Coluna renomeada','info');
+      }else titleEl.textContent=origName;
+    });
+    titleEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();titleEl.blur()}if(e.key==='Escape'){titleEl.textContent=origName;titleEl.blur()}});
 
-    // Render cards
-    const body=colEl.querySelector('.kb-col-body');
-    cards.forEach(card=>{
-      const cardEl=document.createElement('div');
-      cardEl.className='kb-card';
-      cardEl.draggable=true;
-      cardEl.dataset.cardId=card.id;
-      cardEl.addEventListener('dragstart',()=>{dragCard=card.id;cardEl.classList.add('dragging')});
-      cardEl.addEventListener('dragend',()=>{dragCard=null;cardEl.classList.remove('dragging')});
-
-      const loc=card.cidade&&card.estado?card.cidade+'/'+card.estado:'';
-      cardEl.innerHTML=
-        '<div class="kc-name">'+titleCase(card.cliente_nome)+'</div>'+
-        '<div class="kc-info">'+card.telefone+(loc?' — '+loc:'')+'</div>'+
-        (card.nota?'<div class="kc-nota">'+card.nota+'</div>':'')+
-        '<button class="kc-del" data-action="delcard" data-card="'+card.id+'" title="Remover">&#10005;</button>';
-      body.appendChild(cardEl);
+    // Delete column
+    head.querySelector('.kb-col-del').addEventListener('click',async()=>{
+      const ok=await confirmDialog('Excluir coluna','Tem certeza que quer excluir a coluna <strong>'+col.nome+'</strong> e todos os clientes nela?');
+      if(!ok)return;
+      await sb.rpc('kanban_delete_column',{p_column_id:col.id});
+      toast('Coluna excluida','info');
+      await loadBoard(currentBoard);
     });
 
-    // Add card button
-    const addBtn=document.createElement('button');
-    addBtn.className='kb-add-card';
-    addBtn.textContent='+ Adicionar cliente';
-    addBtn.addEventListener('click',()=>showAddCard(body,col.id,addBtn));
-    body.appendChild(addBtn);
+    colEl.appendChild(head);
+
+    // Body
+    const body=document.createElement('div');body.className='kb-col-body';
+
+    cards.forEach(card=>{
+      const c=document.createElement('div');c.className='kb-card';c.draggable=true;c.dataset.cardId=card.id;
+      c.addEventListener('dragstart',()=>{dragCardId=card.id;c.classList.add('dragging')});
+      c.addEventListener('dragend',()=>{dragCardId=null;c.classList.remove('dragging')});
+
+      const loc=card.cidade&&card.estado?card.cidade+'/'+card.estado:'';
+      c.innerHTML=
+        '<div class="kc-top"><span class="kc-name">'+titleCase(card.cliente_nome)+'</span><div class="kc-actions">'+
+        '<button class="kc-btn move-btn" title="Mover para...">&#8644;</button>'+
+        '<button class="kc-btn del kc-del-btn" title="Remover">&#10005;</button>'+
+        '</div></div>'+
+        '<div class="kc-info">'+card.telefone+(loc?' &middot; '+loc:'')+'</div>'+
+        (card.nota?'<div class="kc-nota">'+card.nota+'</div>':'');
+
+      // Move button
+      c.querySelector('.move-btn').addEventListener('click',e=>{
+        e.stopPropagation();
+        closeMoveDrops();
+        const drop=document.createElement('div');drop.className='move-drop';drop.dataset.moveId=card.id;
+        drop.innerHTML='<div class="move-drop-title">Mover para</div>';
+        boardData.columns.filter(cc=>cc.id!==col.id).forEach(cc=>{
+          const item=document.createElement('div');item.className='move-drop-item';
+          item.innerHTML='<div class="md-dot" style="background:'+cc.cor+'"></div>'+cc.nome;
+          item.addEventListener('click',async()=>{
+            await sb.rpc('kanban_move_card',{p_card_id:card.id,p_new_column_id:cc.id,p_new_pos:0});
+            toast('Movido para '+cc.nome,'success');
+            await loadBoard(currentBoard);
+          });
+          drop.appendChild(item);
+        });
+        c.appendChild(drop);openMoveDropId=card.id;
+      });
+
+      // Delete button
+      c.querySelector('.kc-del-btn').addEventListener('click',async e=>{
+        e.stopPropagation();
+        const ok=await confirmDialog('Remover cliente','Remover <strong>'+titleCase(card.cliente_nome)+'</strong> desta coluna?');
+        if(!ok)return;
+        await sb.rpc('kanban_delete_card',{p_card_id:card.id});
+        toast('Cliente removido','info');
+        await loadBoard(currentBoard);
+      });
+
+      body.appendChild(c);
+    });
+
+    colEl.appendChild(body);
+
+    // Add card area
+    const addWrap=document.createElement('div');addWrap.className='kb-add-wrap';
+    const addBtn=document.createElement('button');addBtn.className='kb-add-btn';
+    addBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Adicionar cliente';
+    addBtn.addEventListener('click',()=>showSearch(addWrap,col.id,addBtn));
+    addWrap.appendChild(addBtn);
+    colEl.appendChild(addWrap);
 
     el.appendChild(colEl);
   });
 
-  // Add column button
-  const addCol=document.createElement('div');
-  addCol.className='kb-add-col';
-  addCol.textContent='+ Nova coluna';
-  addCol.addEventListener('click',addColumn);
+  // Add column
+  const addCol=document.createElement('div');addCol.className='kb-add-col';addCol.id='addColBtn';
+  addCol.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova coluna';
+  addCol.addEventListener('click',showNewColumn);
   el.appendChild(addCol);
-
-  // Event delegation for buttons
-  el.addEventListener('click',async e=>{
-    const btn=e.target.closest('[data-action]');
-    if(!btn)return;
-    const action=btn.dataset.action;
-
-    if(action==='delcard'){
-      if(confirm('Remover este cliente da coluna?')){
-        await sb.rpc('kanban_delete_card',{p_card_id:parseInt(btn.dataset.card)});
-        await loadBoard(currentBoard);
-      }
-    }
-    if(action==='delcol'){
-      if(confirm('Excluir esta coluna e todos os clientes nela?')){
-        await sb.rpc('kanban_delete_column',{p_column_id:parseInt(btn.dataset.col)});
-        await loadBoard(currentBoard);
-      }
-    }
-    if(action==='rename'){
-      const newName=prompt('Novo nome da coluna:');
-      if(newName&&newName.trim()){
-        await sb.rpc('kanban_rename_column',{p_column_id:parseInt(btn.dataset.col),p_nome:newName.trim()});
-        await loadBoard(currentBoard);
-      }
-    }
-  });
 }
 
-// ═══ ADD CARD (search clients) ═══
-function showAddCard(body,colId,addBtn){
-  // Replace button with search input
-  const wrap=document.createElement('div');
-  wrap.className='search-drop';
-  wrap.innerHTML='<input type="text" placeholder="Buscar cliente..." autofocus><div class="search-results"></div>';
+// Close move dropdowns
+function closeMoveDrops(){document.querySelectorAll('.move-drop').forEach(d=>d.remove());openMoveDropId=null}
+document.addEventListener('click',e=>{if(!e.target.closest('.move-btn')&&!e.target.closest('.move-drop'))closeMoveDrops()});
+
+// ═══ SEARCH CLIENTS ═══
+function showSearch(wrap,colId,addBtn){
   addBtn.style.display='none';
-  body.appendChild(wrap);
+  const search=document.createElement('div');search.className='search-inline';
+  search.innerHTML='<input type="text" placeholder="Digite o nome do cliente..." autofocus><div class="sr-list"><div class="sr-hint">Digite pelo menos 2 letras...</div></div><button class="sr-cancel">Cancelar (Esc)</button>';
+  wrap.insertBefore(search,addBtn);
 
-  const input=wrap.querySelector('input');
-  const results=wrap.querySelector('.search-results');
-  let debounce;
+  const input=search.querySelector('input');
+  const list=search.querySelector('.sr-list');
+  const cancel=search.querySelector('.sr-cancel');
+  let debounce,selIdx=-1;
 
+  function close(){search.remove();addBtn.style.display=''}
+
+  cancel.addEventListener('click',close);
   input.focus();
 
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Escape')close();
+    const items=list.querySelectorAll('.sr-item');
+    if(e.key==='ArrowDown'){e.preventDefault();selIdx=Math.min(selIdx+1,items.length-1);items.forEach((it,i)=>it.classList.toggle('sel',i===selIdx))}
+    if(e.key==='ArrowUp'){e.preventDefault();selIdx=Math.max(selIdx-1,0);items.forEach((it,i)=>it.classList.toggle('sel',i===selIdx))}
+    if(e.key==='Enter'&&selIdx>=0&&items[selIdx])items[selIdx].click();
+  });
+
   input.addEventListener('input',()=>{
-    clearTimeout(debounce);
+    clearTimeout(debounce);selIdx=-1;
     const q=input.value.trim();
-    if(q.length<2){results.classList.remove('show');return}
+    if(q.length<2){list.innerHTML='<div class="sr-hint">Digite pelo menos 2 letras...</div>';return}
+    list.innerHTML='<div class="sr-hint">Buscando...</div>';
     debounce=setTimeout(async()=>{
-      const {data}=await sb.rpc('kanban_search_contatos',{p_query:q});
-      if(!data||!data.length){results.innerHTML='<div class="search-result"><span class="sr-name">Nenhum resultado</span></div>';results.classList.add('show');return}
-      results.innerHTML='';
+      const{data}=await sb.rpc('kanban_search_contatos',{p_query:q});
+      if(!data||!data.length){list.innerHTML='<div class="sr-hint">Nenhum cliente encontrado</div>';return}
+      list.innerHTML='';
       data.forEach(c=>{
-        const r=document.createElement('div');
-        r.className='search-result';
         const loc=c.cidade&&c.estado?c.cidade+'/'+c.estado:'';
-        r.innerHTML='<div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-info">'+c.telefone+(loc?' — '+loc:'')+'</div>';
-        r.addEventListener('click',async()=>{
+        const item=document.createElement('div');item.className='sr-item';
+        item.innerHTML='<div class="sr-av">'+ini(titleCase(c.nome))+'</div><div class="sr-info"><div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-meta">'+c.telefone+(loc?' &middot; '+loc:'')+'</div></div>';
+        item.addEventListener('click',async()=>{
+          input.disabled=true;item.style.opacity='.5';
           await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:c.id});
-          wrap.remove();addBtn.style.display='';
+          toast(titleCase(c.nome)+' adicionada','success');
+          close();
           await loadBoard(currentBoard);
         });
-        results.appendChild(r);
+        list.appendChild(item);
       });
-      results.classList.add('show');
-    },300);
-  });
-
-  input.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){wrap.remove();addBtn.style.display=''}
-  });
-
-  input.addEventListener('blur',()=>{
-    setTimeout(()=>{wrap.remove();addBtn.style.display=''},200);
+    },250);
   });
 }
 
-// ═══ ADD COLUMN ═══
-async function addColumn(){
-  const nome=prompt('Nome da nova coluna:');
-  if(!nome||!nome.trim())return;
-  const colors=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A'];
-  const cor=colors[Math.floor(Math.random()*colors.length)];
-  await sb.rpc('kanban_add_column',{p_board_id:currentBoard,p_nome:nome.trim(),p_cor:cor});
-  await loadBoard(currentBoard);
+// ═══ ADD COLUMN (inline) ═══
+function showNewColumn(){
+  const addBtn=document.getElementById('addColBtn');addBtn.style.display='none';
+  const form=document.createElement('div');form.className='kb-new-col';
+  form.innerHTML='<input type="text" placeholder="Nome da coluna..." autofocus><div class="nc-btns"><button class="nc-btn secondary">Cancelar</button><button class="nc-btn primary">Criar</button></div>';
+  addBtn.parentNode.insertBefore(form,addBtn);
+
+  const input=form.querySelector('input');
+  const cancelBtn=form.querySelector('.secondary');
+  const createBtn=form.querySelector('.primary');
+
+  function close(){form.remove();addBtn.style.display=''}
+
+  cancelBtn.addEventListener('click',close);
+  input.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='Enter')create()});
+  createBtn.addEventListener('click',create);
+  input.focus();
+
+  async function create(){
+    const nome=input.value.trim();
+    if(!nome)return input.focus();
+    input.disabled=true;createBtn.disabled=true;createBtn.textContent='Criando...';
+    await sb.rpc('kanban_add_column',{p_board_id:currentBoard,p_nome:nome,p_cor:randCol()});
+    toast('Coluna "'+nome+'" criada','success');
+    close();
+    await loadBoard(currentBoard);
+  }
 }
 
 // ═══ INIT ═══
-loadBoards();
+renderBoardTabs();loadBoard(currentBoard);
 </script>
 </body>
 </html>
