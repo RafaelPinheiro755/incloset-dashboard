@@ -356,12 +356,15 @@ function renderKanban(){
         '<div class="kc-info">'+card.telefone+(loc?' &middot; '+loc:'')+'</div>'+
         (card.nota?'<div class="kc-nota">'+card.nota+'</div>':'');
 
-      // Move button
-      c.querySelector('.move-btn').addEventListener('click',e=>{
+      // Move button — shows current board columns + other board columns
+      c.querySelector('.move-btn').addEventListener('click',async e=>{
         e.stopPropagation();
         closeMoveDrops();
         const drop=document.createElement('div');drop.className='move-drop';drop.dataset.moveId=card.id;
-        drop.innerHTML='<div class="move-drop-title">Mover para</div>';
+
+        // Current board columns
+        const curBoardName=boards.find(b=>b.id===currentBoard).nome;
+        drop.innerHTML='<div class="move-drop-title">'+curBoardName+'</div>';
         boardData.columns.filter(cc=>cc.id!==col.id).forEach(cc=>{
           const item=document.createElement('div');item.className='move-drop-item';
           item.innerHTML='<div class="md-dot" style="background:'+cc.cor+'"></div>'+cc.nome;
@@ -372,6 +375,26 @@ function renderKanban(){
           });
           drop.appendChild(item);
         });
+
+        // Other board columns
+        const otherBoard=boards.find(b=>b.id!==currentBoard);
+        const{data:otherData}=await sb.rpc('kanban_get_board',{p_board_id:otherBoard.id});
+        if(otherData&&otherData.columns&&otherData.columns.length){
+          const sep=document.createElement('div');sep.className='move-drop-title';sep.style.borderTop='1px solid var(--border)';sep.style.marginTop='4px';sep.style.paddingTop='8px';
+          sep.textContent=otherBoard.nome;
+          drop.appendChild(sep);
+          otherData.columns.forEach(cc=>{
+            const item=document.createElement('div');item.className='move-drop-item';
+            item.innerHTML='<div class="md-dot" style="background:'+cc.cor+'"></div>'+cc.nome;
+            item.addEventListener('click',async()=>{
+              await sb.rpc('kanban_move_card',{p_card_id:card.id,p_new_column_id:cc.id,p_new_pos:0});
+              toast('Movido para '+otherBoard.nome+' > '+cc.nome,'success');
+              await loadBoard(currentBoard);
+            });
+            drop.appendChild(item);
+          });
+        }
+
         c.appendChild(drop);openMoveDropId=card.id;
       });
 
@@ -422,7 +445,7 @@ function showSearch(wrap,colId,addBtn){
   const input=search.querySelector('input');
   const list=search.querySelector('.sr-list');
   const cancel=search.querySelector('.sr-cancel');
-  let debounce,selIdx=-1;
+  let debounce,selIdx=-1,lastQuery='';
 
   function close(){search.remove();addBtn.style.display=''}
 
@@ -437,30 +460,110 @@ function showSearch(wrap,colId,addBtn){
     if(e.key==='Enter'&&selIdx>=0&&items[selIdx])items[selIdx].click();
   });
 
+  function showNewClientBtn(q){
+    const btn=document.createElement('div');btn.className='sr-item';btn.style.cssText='color:var(--brown);font-weight:600;gap:8px';
+    btn.innerHTML='<div class="sr-av" style="background:var(--brown-s);color:var(--brown)">+</div><div class="sr-info"><div class="sr-name" style="color:var(--brown)">Cadastrar novo cliente</div><div class="sr-meta">'+q+' nao encontrado — clique para criar</div></div>';
+    btn.addEventListener('click',()=>showNewClientForm(search,list,colId,close,q));
+    list.appendChild(btn);
+  }
+
   input.addEventListener('input',()=>{
     clearTimeout(debounce);selIdx=-1;
-    const q=input.value.trim();
+    const q=input.value.trim();lastQuery=q;
     if(q.length<2){list.innerHTML='<div class="sr-hint">Digite pelo menos 2 letras...</div>';return}
     list.innerHTML='<div class="sr-hint">Buscando...</div>';
     debounce=setTimeout(async()=>{
       const{data}=await sb.rpc('kanban_search_contatos',{p_query:q});
-      if(!data||!data.length){list.innerHTML='<div class="sr-hint">Nenhum cliente encontrado</div>';return}
       list.innerHTML='';
-      data.forEach(c=>{
-        const loc=c.cidade&&c.estado?c.cidade+'/'+c.estado:'';
-        const item=document.createElement('div');item.className='sr-item';
-        item.innerHTML='<div class="sr-av">'+ini(titleCase(c.nome))+'</div><div class="sr-info"><div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-meta">'+c.telefone+(loc?' &middot; '+loc:'')+'</div></div>';
-        item.addEventListener('click',async()=>{
-          input.disabled=true;item.style.opacity='.5';
-          await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:c.id});
-          toast(titleCase(c.nome)+' adicionada','success');
-          close();
-          await loadBoard(currentBoard);
+      if(data&&data.length){
+        data.forEach(c=>{
+          const loc=c.cidade&&c.estado?c.cidade+'/'+c.estado:'';
+          const item=document.createElement('div');item.className='sr-item';
+          item.innerHTML='<div class="sr-av">'+ini(titleCase(c.nome))+'</div><div class="sr-info"><div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-meta">'+c.telefone+(loc?' &middot; '+loc:'')+'</div></div>';
+          item.addEventListener('click',async()=>{
+            input.disabled=true;item.style.opacity='.5';
+            await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:c.id});
+            toast(titleCase(c.nome)+' adicionada','success');
+            close();await loadBoard(currentBoard);
+          });
+          list.appendChild(item);
         });
-        list.appendChild(item);
-      });
+      } else {
+        list.innerHTML='<div class="sr-hint">Nenhum cliente encontrado</div>';
+      }
+      showNewClientBtn(q);
     },250);
   });
+}
+
+// ═══ NEW CLIENT FORM ═══
+function showNewClientForm(searchEl,listEl,colId,closeFn,prefillName){
+  searchEl.innerHTML='';
+  searchEl.innerHTML=
+    '<div style="font-size:.8rem;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><div class="sr-av" style="background:var(--brown-s);color:var(--brown);width:24px;height:24px;font-size:.55rem">+</div>Cadastrar novo cliente</div>'+
+    '<div class="nf-fields">'+
+      '<input name="nome" type="text" placeholder="Nome completo *" value="'+prefillName+'" autofocus>'+
+      '<input name="telefone" type="tel" placeholder="Telefone * (ex: 31 99999-9999)">'+
+      '<div style="display:flex;gap:6px"><input name="cidade" type="text" placeholder="Cidade" style="flex:1"><input name="estado" type="text" placeholder="UF" style="width:50px;text-transform:uppercase"></div>'+
+      '<input name="email" type="email" placeholder="E-mail (opcional)">'+
+    '</div>'+
+    '<div class="nc-btns" style="margin-top:10px"><button class="nc-btn secondary nf-cancel">Cancelar</button><button class="nc-btn primary nf-save">Cadastrar e adicionar</button></div>'+
+    '<div class="nf-error" style="display:none;margin-top:6px;font-size:.72rem;color:var(--fail);text-align:center"></div>';
+
+  // Style the inputs
+  searchEl.querySelectorAll('.nf-fields input').forEach(inp=>{
+    inp.style.cssText='width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--txt);font-family:var(--fb);font-size:.78rem;outline:none;margin-bottom:6px;transition:border-color .15s';
+    inp.addEventListener('focus',()=>inp.style.borderColor='var(--brown)');
+    inp.addEventListener('blur',()=>inp.style.borderColor='var(--border)');
+  });
+
+  const nomeInp=searchEl.querySelector('[name=nome]');
+  const telInp=searchEl.querySelector('[name=telefone]');
+  const cidInp=searchEl.querySelector('[name=cidade]');
+  const ufInp=searchEl.querySelector('[name=estado]');
+  const emailInp=searchEl.querySelector('[name=email]');
+  const errEl=searchEl.querySelector('.nf-error');
+  const saveBtn=searchEl.querySelector('.nf-save');
+
+  // Auto-format phone
+  telInp.addEventListener('input',()=>{
+    let v=telInp.value.replace(/\D/g,'');
+    if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2);
+    if(v.length>10)v=v.slice(0,10)+'-'+v.slice(10,14);
+    telInp.value=v;
+  });
+
+  searchEl.querySelector('.nf-cancel').addEventListener('click',closeFn);
+
+  saveBtn.addEventListener('click',async()=>{
+    const nome=nomeInp.value.trim();
+    const tel=telInp.value.trim();
+    if(!nome){errEl.textContent='Nome e obrigatorio';errEl.style.display='block';nomeInp.focus();return}
+    if(!tel||tel.length<14){errEl.textContent='Telefone e obrigatorio (com DDD)';errEl.style.display='block';telInp.focus();return}
+
+    saveBtn.disabled=true;saveBtn.textContent='Salvando...';errEl.style.display='none';
+
+    try{
+      const{data,error}=await sb.rpc('kanban_create_contato',{
+        p_nome:nome,
+        p_telefone:tel,
+        p_cidade:cidInp.value.trim()||null,
+        p_estado:ufInp.value.trim().toUpperCase()||null,
+        p_email:emailInp.value.trim()||null
+      });
+      if(error)throw error;
+
+      await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:data.id});
+      toast(titleCase(nome)+' cadastrada e adicionada','success');
+      closeFn();await loadBoard(currentBoard);
+    }catch(e){
+      errEl.textContent=e.message||'Erro ao cadastrar — telefone ja existe?';
+      errEl.style.display='block';
+      saveBtn.disabled=false;saveBtn.textContent='Cadastrar e adicionar';
+    }
+  });
+
+  nomeInp.focus();nomeInp.select();
 }
 
 // ═══ ADD COLUMN (inline) ═══
