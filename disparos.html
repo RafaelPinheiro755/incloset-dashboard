@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In Closet — Disparos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root,[data-theme="light"]{
+  --card:rgba(255,255,255,0.72);--card-s:rgba(255,255,255,0.88);
+  --surface:rgba(237,230,222,0.65);--surface-w:rgba(230,220,210,0.75);
+  --border:rgba(155,122,90,0.16);--border-a:rgba(155,122,90,0.30);
+  --txt:#3D2E25;--txt2:#6E5D52;--txt3:#9B8E84;
+  --brown:#9B7A5A;--brown-s:rgba(155,122,90,0.10);
+  --rose:#C48D8D;--wine:#8B3A5A;--wine-s:rgba(139,58,90,0.10);
+  --blush:#E0C0B8;--champ:#D8C8B8;--gold:#A88550;
+  --ok:#7AAE8E;--fail:#B85C5C;
+  --page-bg:#E5DDD5;
+  --hdr-bg:rgba(255,255,255,0.65);
+  --bg-ov-top:rgba(229,221,213,0.30);--bg-ov-mid:rgba(229,221,213,0.62);--bg-ov-bot:rgba(229,221,213,0.88);
+  --col-bg:rgba(245,239,232,0.7);
+  --r-sm:10px;--r-md:14px;--r-lg:20px;--r-pill:50px;
+  --sh:0 4px 24px rgba(60,40,20,0.10),0 1px 4px rgba(60,40,20,0.06);
+  --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',-apple-system,sans-serif;
+}
+
+[data-theme="dark"]{
+  --card:rgba(30,26,22,0.80);--card-s:rgba(35,30,26,0.90);
+  --surface:rgba(50,42,35,0.70);--surface-w:rgba(60,50,42,0.80);
+  --border:rgba(155,122,90,0.20);--border-a:rgba(155,122,90,0.35);
+  --txt:#E8E0D8;--txt2:#B8A898;--txt3:#7A6E62;
+  --brown:#C4A070;--brown-s:rgba(196,160,112,0.12);
+  --rose:#D4A0A0;--wine:#C47090;--wine-s:rgba(196,112,144,0.12);
+  --blush:#8B6060;--champ:#6B5A4A;--gold:#C4A060;
+  --ok:#80C8A0;--fail:#D08080;
+  --page-bg:#1A1614;
+  --hdr-bg:rgba(26,22,20,0.80);
+  --bg-ov-top:rgba(26,22,20,0.40);--bg-ov-mid:rgba(26,22,20,0.70);--bg-ov-bot:rgba(26,22,20,0.92);
+  --col-bg:rgba(40,35,30,0.7);
+}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:var(--page-bg);transition:background .3s,color .3s}
+
+.bg{position:fixed;inset:0;z-index:0;background:url('https://images.tcdn.com.br/img/img_prod/1338516/69988d827e0c2_bannerteste.png') center center/cover no-repeat}
+.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(1.5px);transition:background .3s}
+.app{position:relative;z-index:2}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:68px;background:var(--hdr-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;transition:background .3s}
+.hdr-l{display:flex;align-items:center;gap:14px}
+.logo{width:42px;height:42px;background:linear-gradient(145deg,#EDE0D6,#DBC8BB);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(155,122,90,0.2);flex-shrink:0;text-decoration:none}
+.logo span{font-family:var(--fd);font-style:italic;font-size:.6rem;color:#6B4F3A;line-height:1.05;text-align:center}
+.brand h1{font-family:var(--fd);font-size:1.35rem;font-weight:400;line-height:1.15}
+.brand h1 em{font-style:italic;font-weight:300;color:var(--brown)}
+.brand small{font-size:.64rem;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
+.hdr-r{display:flex;align-items:center;gap:10px}
+
+/* Nav */
+.nav-links{display:flex;gap:4px;background:var(--surface);border-radius:var(--r-pill);padding:3px;border:1px solid var(--border)}
+.nav-link{padding:7px 18px;border-radius:var(--r-pill);text-decoration:none;font-size:.78rem;font-weight:500;color:var(--txt3);transition:all .2s}
+.nav-link:hover{color:var(--txt2)}
+.nav-link.active{background:var(--card);color:var(--brown);font-weight:600;box-shadow:0 1px 6px rgba(60,40,20,0.06)}
+
+.theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .3s;line-height:1}
+.theme-btn:hover{border-color:var(--border-a);transform:scale(1.1) rotate(15deg)}
+
+/* MAIN */
+.main{padding:24px 30px;max-width:100%}
+
+/* Board tabs */
+.board-tabs{display:flex;gap:8px;margin-bottom:20px;align-items:center}
+.board-tab{padding:10px 24px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);font-family:var(--fd);font-size:1.1rem;font-weight:500;color:var(--txt3);cursor:pointer;transition:all .2s}
+.board-tab:hover{border-color:var(--border-a);color:var(--txt2)}
+.board-tab.active{border-color:var(--brown);color:var(--brown);background:var(--card-s);box-shadow:var(--sh)}
+.board-tab em{font-style:italic;font-weight:400}
+
+/* Kanban */
+.kanban{display:flex;gap:14px;overflow-x:auto;padding-bottom:20px;align-items:flex-start;min-height:calc(100vh - 200px)}
+
+.kb-col{min-width:280px;max-width:320px;flex-shrink:0;border-radius:var(--r-md);background:var(--col-bg);backdrop-filter:blur(12px);border:1px solid var(--border);display:flex;flex-direction:column;transition:background .3s}
+.kb-col.drag-over{border-color:var(--brown);box-shadow:0 0 0 2px var(--brown-s)}
+
+.kb-col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);gap:8px}
+.kb-col-title{font-size:.82rem;font-weight:600;flex:1;min-width:0}
+.kb-col-count{font-size:.62rem;color:var(--txt3);background:var(--surface);padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
+.kb-col-menu{display:flex;gap:2px}
+.kb-col-btn{width:26px;height:26px;border-radius:6px;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.kb-col-btn:hover{background:var(--surface);color:var(--txt)}
+
+.kb-col-body{padding:8px;flex:1;min-height:60px;display:flex;flex-direction:column;gap:6px}
+
+/* Cards */
+.kb-card{background:var(--card-s);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:grab;transition:all .15s;position:relative}
+.kb-card:hover{border-color:var(--border-a);box-shadow:var(--sh)}
+.kb-card:active{cursor:grabbing;opacity:.8;transform:scale(.98)}
+.kb-card.dragging{opacity:.4;border-style:dashed}
+.kb-card .kc-name{font-size:.78rem;font-weight:600;margin-bottom:2px}
+.kb-card .kc-info{font-size:.64rem;color:var(--txt3)}
+.kb-card .kc-nota{font-size:.66rem;color:var(--txt2);margin-top:4px;font-style:italic;border-top:1px solid var(--border);padding-top:4px}
+.kb-card .kc-del{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-size:.6rem;display:none;align-items:center;justify-content:center;transition:all .15s}
+.kb-card:hover .kc-del{display:flex}
+.kb-card .kc-del:hover{background:rgba(184,92,92,0.1);color:var(--fail)}
+
+/* Add card */
+.kb-add-card{padding:8px 12px;border-radius:var(--r-sm);border:1px dashed var(--border);background:transparent;color:var(--txt3);font-family:var(--fb);font-size:.74rem;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.kb-add-card:hover{border-color:var(--brown);color:var(--brown);background:var(--brown-s)}
+
+/* Add column */
+.kb-add-col{min-width:280px;max-width:320px;flex-shrink:0;border-radius:var(--r-md);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;padding:40px 20px;cursor:pointer;color:var(--txt3);font-size:.82rem;transition:all .2s;background:transparent}
+.kb-add-col:hover{border-color:var(--brown);color:var(--brown);background:var(--brown-s)}
+
+/* Search dropdown */
+.search-drop{position:relative}
+.search-drop input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);color:var(--txt);font-family:var(--fb);font-size:.76rem;outline:none;transition:border-color .15s}
+.search-drop input:focus{border-color:var(--brown)}
+.search-drop input::placeholder{color:var(--txt3)}
+.search-results{position:absolute;top:100%;left:0;right:0;background:var(--card-s);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:0 0 var(--r-sm) var(--r-sm);max-height:180px;overflow-y:auto;z-index:20;display:none}
+.search-results.show{display:block}
+.search-result{padding:8px 10px;font-size:.74rem;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.search-result:hover{background:var(--brown-s)}
+.search-result:last-child{border-bottom:none}
+.search-result .sr-name{font-weight:600}
+.search-result .sr-info{font-size:.64rem;color:var(--txt3)}
+
+/* Color dot on column header */
+.col-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Responsive */
+@media(max-width:768px){
+  .hdr{padding:0 16px;height:60px}
+  .main{padding:16px 12px}
+  .kanban{gap:10px}
+  .kb-col,.kb-add-col{min-width:260px}
+  .nav-links{display:none}
+}
+
+::-webkit-scrollbar{width:4px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--champ);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--brown)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-ov"></div>
+<div class="app">
+  <header class="hdr">
+    <div class="hdr-l">
+      <a href="index.html" class="logo"><span>in<br>closet</span></a>
+      <div class="brand"><h1>Painel de <em>Disparos</em></h1><small>Kanban de contatos por vendedora</small></div>
+    </div>
+    <div class="hdr-r">
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Aniversários</a>
+        <a href="disparos.html" class="nav-link active">Disparos</a>
+      </nav>
+      <button class="theme-btn" id="themeBtn">&#9789;</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="board-tabs" id="boardTabs"></div>
+    <div class="kanban" id="kanban"></div>
+  </main>
+</div>
+
+<script>
+const sb = supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+
+function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+
+// ═══ THEME ═══
+const themeBtn=document.getElementById('themeBtn');
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.innerHTML=t==='dark'?'&#9788;':'&#9789;';localStorage.setItem('incloset-theme',t)}
+themeBtn.addEventListener('click',()=>{const c=document.documentElement.getAttribute('data-theme');setTheme(c==='dark'?'light':'dark')});
+const saved=localStorage.getItem('incloset-theme');if(saved)setTheme(saved);
+
+// ═══ STATE ═══
+let boards=[];
+let currentBoard=1;
+let boardData=null;
+let dragCard=null;
+
+// ═══ LOAD BOARDS ═══
+async function loadBoards(){
+  // We know boards are id=1 (Fran) and id=2 (Ju) from the migration
+  boards=[{id:1,nome:'Fran'},{id:2,nome:'Ju'}];
+  renderBoardTabs();
+  await loadBoard(currentBoard);
+}
+
+function renderBoardTabs(){
+  const el=document.getElementById('boardTabs');
+  el.innerHTML='';
+  boards.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='board-tab'+(b.id===currentBoard?' active':'');
+    btn.innerHTML='Disparos <em>'+b.nome+'</em>';
+    btn.addEventListener('click',()=>{currentBoard=b.id;renderBoardTabs();loadBoard(b.id)});
+    el.appendChild(btn);
+  });
+}
+
+// ═══ LOAD BOARD DATA ═══
+async function loadBoard(boardId){
+  const {data}=await sb.rpc('kanban_get_board',{p_board_id:boardId});
+  boardData=data;
+  renderKanban();
+}
+
+// ═══ RENDER KANBAN ═══
+function renderKanban(){
+  const el=document.getElementById('kanban');
+  el.innerHTML='';
+  if(!boardData||!boardData.columns){el.innerHTML='<p style="color:var(--txt3)">Nenhuma coluna</p>';return}
+
+  boardData.columns.forEach(col=>{
+    const colEl=document.createElement('div');
+    colEl.className='kb-col';
+    colEl.dataset.colId=col.id;
+
+    // Drop zone
+    colEl.addEventListener('dragover',e=>{e.preventDefault();colEl.classList.add('drag-over')});
+    colEl.addEventListener('dragleave',()=>colEl.classList.remove('drag-over'));
+    colEl.addEventListener('drop',async e=>{
+      e.preventDefault();colEl.classList.remove('drag-over');
+      if(!dragCard)return;
+      const cardId=parseInt(dragCard);
+      const newColId=col.id;
+      await sb.rpc('kanban_move_card',{p_card_id:cardId,p_new_column_id:newColId,p_new_pos:0});
+      await loadBoard(currentBoard);
+    });
+
+    const cards=col.cards||[];
+
+    colEl.innerHTML=
+      '<div class="kb-col-head">'+
+        '<div class="col-dot" style="background:'+col.cor+'"></div>'+
+        '<span class="kb-col-title">'+col.nome+'</span>'+
+        '<span class="kb-col-count">'+cards.length+'</span>'+
+        '<div class="kb-col-menu">'+
+          '<button class="kb-col-btn" title="Renomear" data-action="rename" data-col="'+col.id+'">&#9998;</button>'+
+          '<button class="kb-col-btn" title="Excluir coluna" data-action="delcol" data-col="'+col.id+'" style="color:var(--fail)">&#10005;</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="kb-col-body" data-col-body="'+col.id+'"></div>';
+
+    // Render cards
+    const body=colEl.querySelector('.kb-col-body');
+    cards.forEach(card=>{
+      const cardEl=document.createElement('div');
+      cardEl.className='kb-card';
+      cardEl.draggable=true;
+      cardEl.dataset.cardId=card.id;
+      cardEl.addEventListener('dragstart',()=>{dragCard=card.id;cardEl.classList.add('dragging')});
+      cardEl.addEventListener('dragend',()=>{dragCard=null;cardEl.classList.remove('dragging')});
+
+      const loc=card.cidade&&card.estado?card.cidade+'/'+card.estado:'';
+      cardEl.innerHTML=
+        '<div class="kc-name">'+titleCase(card.cliente_nome)+'</div>'+
+        '<div class="kc-info">'+card.telefone+(loc?' — '+loc:'')+'</div>'+
+        (card.nota?'<div class="kc-nota">'+card.nota+'</div>':'')+
+        '<button class="kc-del" data-action="delcard" data-card="'+card.id+'" title="Remover">&#10005;</button>';
+      body.appendChild(cardEl);
+    });
+
+    // Add card button
+    const addBtn=document.createElement('button');
+    addBtn.className='kb-add-card';
+    addBtn.textContent='+ Adicionar cliente';
+    addBtn.addEventListener('click',()=>showAddCard(body,col.id,addBtn));
+    body.appendChild(addBtn);
+
+    el.appendChild(colEl);
+  });
+
+  // Add column button
+  const addCol=document.createElement('div');
+  addCol.className='kb-add-col';
+  addCol.textContent='+ Nova coluna';
+  addCol.addEventListener('click',addColumn);
+  el.appendChild(addCol);
+
+  // Event delegation for buttons
+  el.addEventListener('click',async e=>{
+    const btn=e.target.closest('[data-action]');
+    if(!btn)return;
+    const action=btn.dataset.action;
+
+    if(action==='delcard'){
+      if(confirm('Remover este cliente da coluna?')){
+        await sb.rpc('kanban_delete_card',{p_card_id:parseInt(btn.dataset.card)});
+        await loadBoard(currentBoard);
+      }
+    }
+    if(action==='delcol'){
+      if(confirm('Excluir esta coluna e todos os clientes nela?')){
+        await sb.rpc('kanban_delete_column',{p_column_id:parseInt(btn.dataset.col)});
+        await loadBoard(currentBoard);
+      }
+    }
+    if(action==='rename'){
+      const newName=prompt('Novo nome da coluna:');
+      if(newName&&newName.trim()){
+        await sb.rpc('kanban_rename_column',{p_column_id:parseInt(btn.dataset.col),p_nome:newName.trim()});
+        await loadBoard(currentBoard);
+      }
+    }
+  });
+}
+
+// ═══ ADD CARD (search clients) ═══
+function showAddCard(body,colId,addBtn){
+  // Replace button with search input
+  const wrap=document.createElement('div');
+  wrap.className='search-drop';
+  wrap.innerHTML='<input type="text" placeholder="Buscar cliente..." autofocus><div class="search-results"></div>';
+  addBtn.style.display='none';
+  body.appendChild(wrap);
+
+  const input=wrap.querySelector('input');
+  const results=wrap.querySelector('.search-results');
+  let debounce;
+
+  input.focus();
+
+  input.addEventListener('input',()=>{
+    clearTimeout(debounce);
+    const q=input.value.trim();
+    if(q.length<2){results.classList.remove('show');return}
+    debounce=setTimeout(async()=>{
+      const {data}=await sb.rpc('kanban_search_contatos',{p_query:q});
+      if(!data||!data.length){results.innerHTML='<div class="search-result"><span class="sr-name">Nenhum resultado</span></div>';results.classList.add('show');return}
+      results.innerHTML='';
+      data.forEach(c=>{
+        const r=document.createElement('div');
+        r.className='search-result';
+        const loc=c.cidade&&c.estado?c.cidade+'/'+c.estado:'';
+        r.innerHTML='<div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-info">'+c.telefone+(loc?' — '+loc:'')+'</div>';
+        r.addEventListener('click',async()=>{
+          await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:c.id});
+          wrap.remove();addBtn.style.display='';
+          await loadBoard(currentBoard);
+        });
+        results.appendChild(r);
+      });
+      results.classList.add('show');
+    },300);
+  });
+
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){wrap.remove();addBtn.style.display=''}
+  });
+
+  input.addEventListener('blur',()=>{
+    setTimeout(()=>{wrap.remove();addBtn.style.display=''},200);
+  });
+}
+
+// ═══ ADD COLUMN ═══
+async function addColumn(){
+  const nome=prompt('Nome da nova coluna:');
+  if(!nome||!nome.trim())return;
+  const colors=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A'];
+  const cor=colors[Math.floor(Math.random()*colors.length)];
+  await sb.rpc('kanban_add_column',{p_board_id:currentBoard,p_nome:nome.trim(),p_cor:cor});
+  await loadBoard(currentBoard);
+}
+
+// ═══ INIT ═══
+loadBoards();
+</script>
+</body>
+</html>
