@@ -331,22 +331,14 @@ tbody tr:hover .vh{opacity:1}
         </div>
         <div class="tw glass-s">
           <div class="th-bar"><h2>Aniversariantes de <em id="tMonth">Março</em></h2><span class="tbg" id="tC">-</span></div>
-          <div class="ts"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Cidade/UF</th><th>Aniversário</th><th>Enviado em</th><th></th></tr></thead><tbody id="tB"></tbody></table></div>
+          <div class="ts"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Cidade/UF</th><th>Aniversário</th><th></th></tr></thead><tbody id="tB"></tbody></table></div>
           <div class="tf">
-            <div class="lg">
-              <div class="li"><span class="ld" style="background:var(--ok)"></span>Enviado</div>
-              <div class="li"><span class="ld" style="background:var(--brown)"></span>Pendente</div>
-            </div>
             <div class="ti">Clique para ver detalhes</div>
           </div>
         </div>
       </div>
 
       <aside class="side">
-        <div class="cd glass"><div class="ct">Status dos <em>envios</em></div>
-          <div class="donut-wrap"><div class="donut"><svg viewBox="0 0 36 36"><circle class="bg-ring" cx="18" cy="18" r="14"/><circle id="dOk" cx="18" cy="18" r="14" stroke="var(--ok)" stroke-dasharray="0 88"/><circle id="dPend" cx="18" cy="18" r="14" stroke="var(--brown)" stroke-dasharray="0 88"/></svg><div class="donut-center"><strong id="dTotal">-</strong><small>Total</small></div></div><div class="donut-legend" id="dLeg"></div></div>
-        </div>
-
         <div class="cd glass"><div class="ct">Envios dos <em>últimos 7 dias</em></div><div class="bars" id="cB"></div><div class="cs">Total: <strong id="cT">0</strong></div></div>
 
         <!-- BRAZIL MAP -->
@@ -378,7 +370,6 @@ tbody tr:hover .vh{opacity:1}
     <div class="mdl-i"><label>Vendedora</label><span id="mVen"></span></div>
     <div class="mdl-i"><label>Cliente Desde</label><span id="mDes"></span></div>
     <div class="mdl-i"><label>Tipo</label><span id="mTip"></span></div>
-    <div class="mdl-i"><label>Enviado em</label><span id="mSt"></span></div>
   </div>
 </div></div></div>
 
@@ -436,8 +427,8 @@ async function loadData(){
     const acts=rA.data||[];
     const eMap={};monthEnvios.forEach(e=>{eMap[e.contato_id]=e});
     monthContacts.forEach(c=>{c._envio=eMap[c.id]||null;c._titleName=titleCase(c.nome)});
-    renderMetrics();renderHeroStats();renderTable();renderChart();renderDonut();renderActivity(acts);renderTopCidades();renderUpcoming();renderMap();
-  }catch(e){console.error(e);document.getElementById('tB').innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">&#9888;</div><p>Erro ao conectar</p></div></td></tr>'}
+    renderMetrics();renderHeroStats();renderTable();renderChart();renderActivity(acts);renderTopCidades();renderUpcoming();renderMap();
+  }catch(e){console.error(e);document.getElementById('tB').innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">&#9888;</div><p>Erro ao conectar</p></div></td></tr>'}
 }
 
 // ═══ METRICS ═══
@@ -469,17 +460,15 @@ function getFiltered(){
 }
 function renderTable(){
   const data=getFiltered();tB.innerHTML='';
-  if(!data.length){tB.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">&#128197;</div><p>Nenhum aniversariante encontrado</p></div></td></tr>';tC.textContent='0';return}
+  if(!data.length){tB.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ei">&#128197;</div><p>Nenhum aniversariante encontrado</p></div></td></tr>';tC.textContent='0';return}
   tC.textContent=data.length+' registro'+(data.length!==1?'s':'');
   data.forEach(c=>{
     const col=rc(c.nome),envio=c._envio;
     const isT=c.dia_nasc===todayDay;
     const bd=c.dia_nasc+'/'+(now.getMonth()+1).toString().padStart(2,'0')+(isT?' (HOJE)':'');
     const cid=c.cidade&&c.estado?c.cidade+'/'+c.estado:(c.estado||'-');
-    let envioInfo='-';
-    if(envio){const d=new Date(envio.enviado_em);envioInfo=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
     const tr=document.createElement('tr');
-    tr.innerHTML='<td><div class="nc"><div class="nca" style="background:'+col+'12;color:'+col+'">'+ini(c._titleName)+'</div><span class="ncn">'+c._titleName+'</span></div></td><td class="ph">'+c.telefone+'</td><td class="tc">'+cid+'</td><td>'+(isT?'<strong style="color:var(--wine)">'+bd+'</strong>':bd)+'</td><td class="tc">'+envioInfo+'</td><td><span class="vh">Ver &#8250;</span></td>';
+    tr.innerHTML='<td><div class="nc"><div class="nca" style="background:'+col+'12;color:'+col+'">'+ini(c._titleName)+'</div><span class="ncn">'+c._titleName+'</span></div></td><td class="ph">'+c.telefone+'</td><td class="tc">'+cid+'</td><td>'+(isT?'<strong style="color:var(--wine)">'+bd+'</strong>':bd)+'</td><td><span class="vh">Ver &#8250;</span></td>';
     tr.addEventListener('click',()=>openModal(c));tB.appendChild(tr);
   });
 }
@@ -588,12 +577,11 @@ cFb.addEventListener('click',()=>{sI.value='';sX.classList.remove('v');cFb.class
 // ═══ EXPORT CSV ═══
 function exportCSV(){
   const data=getFiltered();
-  const headers=['Nome','Telefone','Email','Cidade','UF','Aniversário','CPF/CNPJ','Vendedora','Tipo','Cliente Desde','Status Envio'];
+  const headers=['Nome','Telefone','Email','Cidade','UF','Aniversário','CPF/CNPJ','Vendedora','Tipo','Cliente Desde'];
   const rows=data.map(c=>[
     c._titleName,c.telefone,c.email||'',c.cidade||'',c.estado||'',
     c.data_nasc||'',c.cpf_cnpj||'',c.vendedor?titleCase(c.vendedor):'',
-    c.tipo_pessoa||'',c.cliente_desde||'',
-    c._envio?c._envio.status:'pendente'
+    c.tipo_pessoa||'',c.cliente_desde||''
   ]);
   let csv='\uFEFF'+headers.join(';')+'\n'+rows.map(r=>r.map(v=>'"'+v+'"').join(';')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
@@ -621,8 +609,6 @@ function openModal(c){
   document.getElementById('mVen').textContent=c.vendedor?titleCase(c.vendedor):'-';
   document.getElementById('mDes').textContent=c.cliente_desde?new Date(c.cliente_desde).toLocaleDateString('pt-BR'):'-';
   document.getElementById('mTip').textContent=(c.tipo_pessoa||'-')+(c.tipo_contato?' — '+c.tipo_contato:'');
-  if(c._envio){const d=new Date(c._envio.enviado_em);document.getElementById('mSt').textContent=d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
-  else document.getElementById('mSt').textContent='Pendente';
   ov.classList.add('on');document.body.style.overflow='hidden';
 }
 function closeM(){ov.classList.remove('on');document.body.style.overflow=''}
