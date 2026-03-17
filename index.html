@@ -370,7 +370,7 @@ tbody tr:hover .vh{opacity:1}
     <div class="mdl-i"><label>Bairro</label><span id="mBai"></span></div>
     <div class="mdl-i"><label>Vendedora</label><span id="mVen"></span></div>
     <div class="mdl-i"><label>Cliente Desde</label><span id="mDes"></span></div>
-    <div class="mdl-i"><label>Tipo</label><span id="mTip"></span></div>
+    <div class="mdl-i"><label>Contato</label><span id="mTip"></span></div>
   </div>
 </div></div></div>
 
@@ -441,7 +441,7 @@ function renderMetrics(){
   document.getElementById('m3').textContent=monthContacts.length;
   document.getElementById('m3s').textContent=curMP;
   document.getElementById('m4').textContent=stats.total_contatos||0;
-  document.getElementById('m4s').textContent=(stats.total_pessoas||0)+' pessoas, '+(stats.total_empresas||0)+' empresas';
+  document.getElementById('m4s').textContent=(stats.total_pessoas||0)+' com celular, '+(stats.total_empresas||0)+' sem celular';
 }
 function renderHeroStats(){
   document.getElementById('hsToday').textContent=stats.envios_hoje||0;
@@ -609,7 +609,7 @@ function openModal(c){
   document.getElementById('mBai').textContent=c.bairro||'-';
   document.getElementById('mVen').textContent=c.vendedor?titleCase(c.vendedor):'-';
   document.getElementById('mDes').textContent=c.cliente_desde?new Date(c.cliente_desde).toLocaleDateString('pt-BR'):'-';
-  document.getElementById('mTip').textContent=(c.tipo_pessoa||'-')+(c.tipo_contato?' — '+c.tipo_contato:'');
+  document.getElementById('mTip').textContent=(c.telefone?'Com celular':'Sem celular')+(c.tipo_contato?' — '+c.tipo_contato:'');
   ov.classList.add('on');document.body.style.overflow='hidden';
 }
 function closeM(){ov.classList.remove('on');document.body.style.overflow=''}
