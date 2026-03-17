@@ -441,7 +441,7 @@ function renderMetrics(){
   document.getElementById('m3').textContent=monthContacts.length;
   document.getElementById('m3s').textContent=curMP;
   document.getElementById('m4').textContent=stats.total_contatos||0;
-  document.getElementById('m4s').textContent=(stats.total_pessoas||0)+' com celular, '+(stats.total_empresas||0)+' sem celular';
+  document.getElementById('m4s').textContent=(stats.total_pessoas||0)+' com celular, '+(stats.total_empresas||0)+' sem celular · '+(stats.com_localizacao||0)+' com loc, '+(stats.sem_localizacao||0)+' sem loc';
 }
 function renderHeroStats(){
   document.getElementById('hsToday').textContent=stats.envios_hoje||0;
