@@ -385,7 +385,7 @@ const DPT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const COLS=['#9B7A5A','#8B3A5A','#7AAE8E','#C48D8D','#A88550','#7BA0B0','#9B88A4','#B07060','#7A9080','#A08870'];
 function rc(n){let h=0;for(let i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return COLS[Math.abs(h)%COLS.length]}
 function ini(n){const p=n.split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()}
-function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+function titleCase(s){const preps=['de','do','da','dos','das','e','em','no','na','du'];return s.split(' ').map((w,i)=>{const l=w.toLowerCase();return i>0&&preps.includes(l)?l:w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}).join(' ')}
 
 const now=new Date(),todayDay=now.getDate(),curME=MEN[now.getMonth()],curMP=MPT[curME];
 
