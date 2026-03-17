@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In Closet — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+/* LIGHT THEME */
+:root,[data-theme="light"]{
+  --card:rgba(255,255,255,0.72);--card-s:rgba(255,255,255,0.88);
+  --surface:rgba(237,230,222,0.65);--surface-w:rgba(230,220,210,0.75);
+  --border:rgba(155,122,90,0.16);--border-a:rgba(155,122,90,0.30);
+  --txt:#3D2E25;--txt2:#6E5D52;--txt3:#9B8E84;
+  --brown:#9B7A5A;--brown-s:rgba(155,122,90,0.10);
+  --rose:#C48D8D;--wine:#8B3A5A;--wine-s:rgba(139,58,90,0.10);
+  --blush:#E0C0B8;--champ:#D8C8B8;--gold:#A88550;
+  --ok:#7AAE8E;--fail:#B85C5C;
+  --page-bg:#E5DDD5;
+  --bg-ov-top:rgba(229,221,213,0.30);--bg-ov-mid:rgba(229,221,213,0.62);--bg-ov-bot:rgba(229,221,213,0.88);
+  --r-sm:10px;--r-md:14px;--r-lg:20px;--r-pill:50px;
+  --sh:0 4px 24px rgba(60,40,20,0.10),0 1px 4px rgba(60,40,20,0.06);
+  --sh-h:0 8px 40px rgba(60,40,20,0.15),0 2px 8px rgba(60,40,20,0.06);
+  --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',-apple-system,sans-serif;
+  --fast:.15s ease;--med:.25s ease;
+}
+
+/* DARK THEME */
+[data-theme="dark"]{
+  --card:rgba(30,26,22,0.80);--card-s:rgba(35,30,26,0.90);
+  --surface:rgba(50,42,35,0.70);--surface-w:rgba(60,50,42,0.80);
+  --border:rgba(155,122,90,0.20);--border-a:rgba(155,122,90,0.35);
+  --txt:#E8E0D8;--txt2:#B8A898;--txt3:#7A6E62;
+  --brown:#C4A070;--brown-s:rgba(196,160,112,0.12);
+  --rose:#D4A0A0;--wine:#C47090;--wine-s:rgba(196,112,144,0.12);
+  --blush:#8B6060;--champ:#6B5A4A;--gold:#C4A060;
+  --ok:#80C8A0;--fail:#D08080;
+  --page-bg:#1A1614;
+  --bg-ov-top:rgba(26,22,20,0.40);--bg-ov-mid:rgba(26,22,20,0.70);--bg-ov-bot:rgba(26,22,20,0.92);
+}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:var(--page-bg);transition:background .3s,color .3s;display:flex;align-items:center;justify-content:center}
+
+.bg{position:fixed;inset:0;z-index:0;background:url('https://images.tcdn.com.br/img/img_prod/1338516/69988d827e0c2_bannerteste.png') center center/cover no-repeat}
+.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(1.5px);transition:background .3s}
+
+.login-card{
+  position:relative;z-index:2;
+  width:92%;max-width:400px;
+  background:var(--card);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-h);
+  overflow:hidden;
+  animation:cardIn .5s ease-out;
+  transition:background .3s,border-color .3s;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.login-bar{height:4px;background:linear-gradient(90deg,var(--wine),var(--rose),var(--champ))}
+
+.login-body{padding:36px 32px 32px}
+
+.login-logo{width:64px;height:64px;background:linear-gradient(145deg,#EDE0D6,#DBC8BB);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(155,122,90,0.2);margin:0 auto 20px}
+.login-logo span{font-family:var(--fd);font-style:italic;font-size:.82rem;color:#6B4F3A;line-height:1.05;text-align:center}
+
+.login-title{font-family:var(--fd);font-size:1.6rem;font-weight:400;text-align:center;margin-bottom:2px}
+.login-title em{font-style:italic;font-weight:300;color:var(--brown)}
+.login-subtitle{font-size:.76rem;color:var(--txt3);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}
+
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin-bottom:5px;font-weight:500}
+.login-field input{
+  width:100%;padding:11px 14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  color:var(--txt);
+  font-family:var(--fb);font-size:.84rem;
+  outline:0;
+  transition:border-color var(--fast),box-shadow var(--fast),background var(--fast);
+}
+.login-field input::placeholder{color:var(--txt3)}
+.login-field input:focus{border-color:var(--brown);box-shadow:0 0 0 3px var(--brown-s);background:var(--card)}
+
+.login-btn{
+  width:100%;padding:12px;margin-top:8px;
+  border:none;border-radius:var(--r-sm);
+  background:linear-gradient(135deg,var(--brown),var(--gold));
+  color:#fff;font-family:var(--fb);font-size:.86rem;font-weight:600;
+  cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:.02em;
+}
+.login-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 16px rgba(155,122,90,0.3)}
+.login-btn:active{transform:translateY(0)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.login-btn .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.login-btn.loading .spinner{display:block}
+.login-btn.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.login-error{
+  display:none;
+  margin-top:14px;padding:10px 14px;
+  background:rgba(184,92,92,0.1);
+  border:1px solid var(--fail);
+  border-radius:var(--r-sm);
+  color:var(--fail);font-size:.78rem;font-weight:500;
+  text-align:center;
+  animation:errorIn .25s ease-out;
+}
+.login-error.show{display:block}
+@keyframes errorIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+.login-footer{
+  margin-top:24px;padding-top:16px;border-top:1px solid var(--border);
+  text-align:center;font-size:.66rem;color:var(--txt3);
+}
+
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:0}::-webkit-scrollbar-thumb{background:var(--champ);border-radius:2px}::-webkit-scrollbar-thumb:hover{background:var(--brown)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-ov"></div>
+
+<div class="login-card">
+  <div class="login-bar"></div>
+  <div class="login-body">
+    <div class="login-logo"><span>in<br>closet</span></div>
+    <h1 class="login-title">In <em>Closet</em></h1>
+    <p class="login-subtitle">Painel de Gestao</p>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="login-field">
+        <label for="loginInput">Login</label>
+        <input type="text" id="loginInput" name="username" placeholder="E-mail ou usuario" autocomplete="username" required>
+      </div>
+      <div class="login-field">
+        <label for="senhaInput">Senha</label>
+        <input type="password" id="senhaInput" name="password" placeholder="Senha" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span class="btn-text">Entrar</span>
+        <div class="spinner"></div>
+      </button>
+    </form>
+
+    <div class="login-error" id="loginError">Login ou senha incorretos</div>
+
+    <div class="login-footer">In Closet &copy; 2026 &mdash; Painel administrativo</div>
+  </div>
+</div>
+
+<script>
+// Apply saved theme
+const savedTheme = localStorage.getItem('incloset-theme');
+if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+// If already logged in, redirect
+const existingUser = JSON.parse(localStorage.getItem('incloset-user') || 'null');
+if (existingUser) { window.location.href = 'index.html'; }
+
+// Supabase client
+const sb = supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+
+const loginForm = document.getElementById('loginForm');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+const loginInput = document.getElementById('loginInput');
+const senhaInput = document.getElementById('senhaInput');
+
+loginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const login = loginInput.value.trim();
+  const senha = senhaInput.value.trim();
+
+  if (!login || !senha) return;
+
+  // Show loading state
+  loginBtn.classList.add('loading');
+  loginBtn.disabled = true;
+  loginError.classList.remove('show');
+
+  try {
+    const { data, error } = await sb.rpc('dashboard_login', { p_login: login, p_senha: senha });
+
+    if (error) throw error;
+
+    if (!data || data === null) {
+      loginError.textContent = 'Login ou senha incorretos';
+      loginError.classList.add('show');
+      loginBtn.classList.remove('loading');
+      loginBtn.disabled = false;
+      senhaInput.value = '';
+      senhaInput.focus();
+      return;
+    }
+
+    // Success — save user and redirect
+    localStorage.setItem('incloset-user', JSON.stringify(data));
+    window.location.href = 'index.html';
+
+  } catch (err) {
+    console.error(err);
+    loginError.textContent = 'Erro ao conectar. Tente novamente.';
+    loginError.classList.add('show');
+    loginBtn.classList.remove('loading');
+    loginBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

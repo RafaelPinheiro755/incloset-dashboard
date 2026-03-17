@@ -224,6 +224,8 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
         <a href="campanhas.html" class="nav-link">Campanhas</a>
       </nav>
       <button class="theme-btn" id="themeBtn">&#9789;</button>
+      <span style="font-size:.72rem;color:var(--txt2)" id="userName"></span>
+      <button class="exp-btn" id="logoutBtn" style="padding:6px 14px;border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface);color:var(--txt2);font-family:var(--fb);font-size:.7rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px">Sair</button>
     </div>
   </header>
 
@@ -246,6 +248,14 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
 <div class="toast-container" id="toasts"></div>
 
 <script>
+// ═══ AUTH CHECK ═══
+const user = JSON.parse(localStorage.getItem('incloset-user') || 'null');
+if (!user) { window.location.href = 'login.html'; }
+
+// Auth UI
+document.getElementById('userName').textContent = user ? user.nome : '';
+document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('incloset-user'); window.location.href = 'login.html'; });
+
 const sb=supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
 
 const COLS_CACHE=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A','#7A9080','#B07060'];
@@ -283,9 +293,26 @@ const boards=[{id:1,nome:'Fran',vendedora:'FRANCIELE SANTOS'},{id:2,nome:'Ju',ve
 let currentBoard=1,boardData=null,dragCardId=null,openMoveDropId=null;
 let dragGhost=null,dragSourceColId=null,dragEnterCount={};
 
+// ═══ VENDEDORA BOARD FILTER ═══
+const isVendedora = user && user.role === 'vendedora' && user.board_id;
+if (isVendedora) {
+  currentBoard = user.board_id;
+}
+
 // ═══ BOARD TABS ═══
 function renderBoardTabs(){
   const el=document.getElementById('boardTabs');el.innerHTML='';
+  if (isVendedora) {
+    // Vendedora: just show the board name, no tabs
+    const board = boards.find(b => b.id === currentBoard);
+    if (board) {
+      const label = document.createElement('span');
+      label.style.cssText = 'font-family:var(--fd);font-size:1.05rem;font-weight:500;color:var(--txt);padding:9px 0';
+      label.innerHTML = 'Disparos <em style="font-style:italic;font-weight:400;color:var(--brown)">' + board.nome + '</em>';
+      el.appendChild(label);
+    }
+    return;
+  }
   boards.forEach(b=>{
     const btn=document.createElement('button');
     btn.className='board-tab'+(b.id===currentBoard?' active':'');

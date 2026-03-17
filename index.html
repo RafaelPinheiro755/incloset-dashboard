@@ -284,7 +284,8 @@ tbody tr:hover .vh{opacity:1}
       </nav>
       <div class="hdr-date" id="hDate"></div>
       <button class="theme-btn" id="themeBtn" title="Alternar tema">&#9790;</button>
-      <div class="av">IC</div>
+      <span style="font-size:.72rem;color:var(--txt2)" id="userName"></span>
+      <button class="exp-btn" id="logoutBtn">Sair</button>
     </div>
   </header>
 
@@ -375,6 +376,14 @@ tbody tr:hover .vh{opacity:1}
 </div></div></div>
 
 <script>
+// ═══ AUTH CHECK ═══
+const user = JSON.parse(localStorage.getItem('incloset-user') || 'null');
+if (!user) { window.location.href = 'login.html'; }
+
+// ═══ AUTH UI ═══
+document.getElementById('userName').textContent = user ? user.nome : '';
+document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('incloset-user'); window.location.href = 'login.html'; });
+
 // ═══ SUPABASE ═══
 const sb = supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
 
