@@ -62,7 +62,7 @@ html{scroll-behavior:smooth}
 body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:var(--page-bg);transition:background .3s,color .3s}
 
 .bg{position:fixed;inset:0;z-index:0;background:url('https://images.tcdn.com.br/img/img_prod/1338516/69988d827e0c2_bannerteste.png') center center/cover no-repeat}
-.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(1.5px);transition:background .3s}
+.bg-ov{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg-ov-top) 0%,var(--bg-ov-mid) 45%,var(--bg-ov-bot) 100%);backdrop-filter:blur(1.5px);transition:background .3s,backdrop-filter .3s}[data-theme="dark"] .bg{background-image:url('https://images.pexels.com/photos/963469/pexels-photo-963469.jpeg?auto=compress&cs=tinysrgb&w=1920');filter:brightness(0.25) saturate(0.4)}[data-theme="dark"] .bg-ov{backdrop-filter:blur(3px)}
 .app{position:relative;z-index:2}
 .glass{background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border);box-shadow:var(--sh);transition:background .3s,border-color .3s}
 .glass-s{background:var(--card-s);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:var(--sh);transition:background .3s}
