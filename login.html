@@ -147,6 +147,10 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
         <label for="senhaInput">Senha</label>
         <input type="password" id="senhaInput" name="password" placeholder="Senha" autocomplete="current-password" required>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 12px">
+        <input type="checkbox" id="rememberMe" style="accent-color:var(--brown);width:15px;height:15px;cursor:pointer">
+        <label for="rememberMe" style="font-size:.76rem;color:var(--txt2);cursor:pointer;user-select:none">Lembrar meu login</label>
+      </div>
       <button type="submit" class="login-btn" id="loginBtn">
         <span class="btn-text">Entrar</span>
         <div class="spinner"></div>
@@ -176,6 +180,11 @@ const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
 const loginInput = document.getElementById('loginInput');
 const senhaInput = document.getElementById('senhaInput');
+const rememberMe = document.getElementById('rememberMe');
+
+// Restore saved login
+const savedLogin = localStorage.getItem('incloset-remember-login');
+if (savedLogin) { loginInput.value = savedLogin; rememberMe.checked = true; senhaInput.focus(); }
 
 loginForm.addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -204,6 +213,10 @@ loginForm.addEventListener('submit', async function(e) {
       senhaInput.focus();
       return;
     }
+
+    // Remember login if checked
+    if (rememberMe.checked) { localStorage.setItem('incloset-remember-login', login); }
+    else { localStorage.removeItem('incloset-remember-login'); }
 
     // Success — save user and redirect
     localStorage.setItem('incloset-user', JSON.stringify(data));
