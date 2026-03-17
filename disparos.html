@@ -279,7 +279,7 @@ function confirmDialog(title,msg){
 }
 
 // ═══ STATE ═══
-const boards=[{id:1,nome:'Fran'},{id:2,nome:'Ju'}];
+const boards=[{id:1,nome:'Fran',vendedora:'FRANCIELE SANTOS'},{id:2,nome:'Ju',vendedora:'JULIANA V RIGUEIRA ALEXANDRINO'}];
 let currentBoard=1,boardData=null,dragCardId=null,openMoveDropId=null;
 let dragGhost=null,dragSourceColId=null,dragEnterCount={};
 
@@ -508,8 +508,10 @@ function showSearch(wrap,colId,addBtn){
           item.innerHTML='<div class="sr-av">'+ini(titleCase(c.nome))+'</div><div class="sr-info"><div class="sr-name">'+titleCase(c.nome)+'</div><div class="sr-meta">'+c.telefone+(loc?' &middot; '+loc:'')+'</div></div>';
           item.addEventListener('click',async()=>{
             input.disabled=true;item.style.opacity='.5';
+            const vendedora=boards.find(b=>b.id===currentBoard).vendedora;
+            await sb.rpc('kanban_assign_vendedor',{p_contato_id:c.id,p_vendedor:vendedora});
             await sb.rpc('kanban_add_card',{p_column_id:colId,p_contato_id:c.id});
-            toast(titleCase(c.nome)+' adicionada','success');
+            toast(titleCase(c.nome)+' adicionada a '+boards.find(b=>b.id===currentBoard).nome,'success');
             close();await loadBoard(currentBoard);
           });
           list.appendChild(item);
@@ -570,12 +572,14 @@ function showNewClientForm(searchEl,listEl,colId,closeFn,prefillName){
     saveBtn.disabled=true;saveBtn.textContent='Salvando...';errEl.style.display='none';
 
     try{
+      const vendedora=boards.find(b=>b.id===currentBoard).vendedora;
       const{data,error}=await sb.rpc('kanban_create_contato',{
         p_nome:nome,
         p_telefone:tel,
         p_cidade:cidInp.value.trim()||null,
         p_estado:ufInp.value.trim().toUpperCase()||null,
-        p_email:emailInp.value.trim()||null
+        p_email:emailInp.value.trim()||null,
+        p_vendedor:vendedora
       });
       if(error)throw error;
 
