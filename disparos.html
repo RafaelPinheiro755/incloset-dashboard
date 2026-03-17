@@ -228,7 +228,15 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
   </header>
 
   <main class="main">
-    <div class="board-tabs" id="boardTabs"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+      <div class="board-tabs" id="boardTabs"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(168,133,80,0.10);font-size:.66rem;color:#A88550;font-weight:600">👑 VIP: R$15k+ ou 5+ pedidos</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(155,122,90,0.10);font-size:.66rem;color:#9B7A5A;font-weight:600">💎 Fiel: 3-4 pedidos</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(212,160,48,0.10);font-size:.66rem;color:#D4A030;font-weight:600">⚠️ Risco: 91-180 dias</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(184,92,92,0.10);font-size:.66rem;color:#B85C5C;font-weight:600">😴 Dorm: 181-365 dias</span>
+      </div>
+    </div>
     <div class="kanban" id="kanban">
       <div class="loading-cols"><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div></div>
     </div>
@@ -241,7 +249,7 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
 const sb=supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
 
 const COLS_CACHE=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A','#7A9080','#B07060'];
-function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+function titleCase(s){const preps=['de','do','da','dos','das','e','em','no','na','du'];return s.split(' ').map((w,i)=>{const l=w.toLowerCase();return i>0&&preps.includes(l)?l:w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}).join(' ')}
 function ini(n){const p=n.split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()}
 function randCol(){return COLS_CACHE[Math.floor(Math.random()*COLS_CACHE.length)]}
 
