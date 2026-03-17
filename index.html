@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>In Closet — Painel de Aniversários</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
@@ -385,7 +385,7 @@ document.getElementById('userName').textContent = user ? user.nome : '';
 document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('incloset-user'); window.location.href = 'login.html'; });
 
 // ═══ SUPABASE ═══
-const sb = supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+const API='https://smncejhkzlpajujkvton.supabase.co/functions/v1/api';const sb={rpc:async(fn,params)=>{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fn,params:params||{}})});const j=await r.json();if(j.error)return{data:null,error:{message:j.error}};return{data:j.data,error:null}}};
 
 // ═══ HELPERS ═══
 const MPT={January:'Janeiro',February:'Fevereiro',March:'Março',April:'Abril',May:'Maio',June:'Junho',July:'Julho',August:'Agosto',September:'Setembro',October:'Outubro',November:'Novembro',December:'Dezembro'};

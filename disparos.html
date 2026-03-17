@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>In Closet — Disparos</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
@@ -256,7 +256,7 @@ if (!user) { window.location.href = 'login.html'; }
 document.getElementById('userName').textContent = user ? user.nome : '';
 document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('incloset-user'); window.location.href = 'login.html'; });
 
-const sb=supabase.createClient('https://smncejhkzlpajujkvton.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbmNlamhremxwYWp1amt2dG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI4MzU2MzIsImV4cCI6MjA0ODQxMTYzMn0.qQ08kj-lyrdWuAXS7-aIBRhT_BAP251yM5GAKwO9Y-M');
+const API='https://smncejhkzlpajujkvton.supabase.co/functions/v1/api';const sb={rpc:async(fn,params)=>{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fn,params:params||{}})});const j=await r.json();if(j.error)return{data:null,error:{message:j.error}};return{data:j.data,error:null}}};
 
 const COLS_CACHE=['#7BA0B0','#9B7A5A','#C48D8D','#7AAE8E','#A88550','#8B3A5A','#7A9080','#B07060'];
 function titleCase(s){const preps=['de','do','da','dos','das','e','em','no','na','du'];return s.split(' ').map((w,i)=>{const l=w.toLowerCase();return i>0&&preps.includes(l)?l:w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}).join(' ')}
