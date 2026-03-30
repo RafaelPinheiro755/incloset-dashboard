@@ -233,12 +233,49 @@ body{font-family:var(--fb);color:var(--txt);min-height:100vh;overflow-x:hidden;-
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
       <div class="board-tabs" id="boardTabs"></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(168,133,80,0.10);font-size:.66rem;color:#A88550;font-weight:600">👑 VIP: R$15k+ ou 5+ pedidos</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(155,122,90,0.10);font-size:.66rem;color:#9B7A5A;font-weight:600">💎 Fiel: 3-4 pedidos</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(212,160,48,0.10);font-size:.66rem;color:#D4A030;font-weight:600">⚠️ Risco: 91-180 dias</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(107,80,64,0.12);font-size:.66rem;color:#6B5040;font-weight:600">💀 Perdidos: 365+ dias</span>
         <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(184,92,92,0.10);font-size:.66rem;color:#B85C5C;font-weight:600">😴 Dorm: 181-365 dias</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(212,160,48,0.10);font-size:.66rem;color:#D4A030;font-weight:600">⚠️ Risco: 91-180 dias</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(155,122,90,0.10);font-size:.66rem;color:#9B7A5A;font-weight:600">💎 Fiel: 3-4 pedidos</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(168,133,80,0.10);font-size:.66rem;color:#A88550;font-weight:600">👑 VIP: R$15k+ ou 5+ pedidos</span>
       </div>
     </div>
+    <!-- PAINEL FILA DE DISPAROS -->
+    <div id="filaPanel" style="display:none;margin-bottom:14px;border-radius:var(--r-md);background:var(--card);backdrop-filter:blur(16px);border:1px solid var(--border);box-shadow:var(--sh);transition:background .3s,border-color .3s;overflow:hidden">
+      <!-- Header -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.1rem">📨</span>
+            <div>
+              <div style="font-family:var(--fd);font-size:1rem;font-weight:500">Campanha de <em style="font-style:italic;color:var(--brown)">Reativacao</em></div>
+              <div style="font-size:.66rem;color:var(--txt3)" id="filaSubtitle">Carregando...</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:.7rem;color:var(--txt3)" id="filaDias"></span>
+            <button id="filaToggle" style="padding:5px 12px;border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface);color:var(--txt2);font-family:var(--fb);font-size:.68rem;font-weight:500;cursor:pointer">Mostrar lista</button>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1;height:8px;border-radius:4px;background:var(--surface);overflow:hidden">
+            <div id="filaBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--ok),var(--brown));transition:width .6s ease;width:0%"></div>
+          </div>
+          <span style="font-size:.72rem;font-weight:600;color:var(--txt);white-space:nowrap" id="filaPct">0%</span>
+        </div>
+        <!-- Stats row -->
+        <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap" id="filaStats"></div>
+      </div>
+      <!-- Contact list (collapsible) -->
+      <div id="filaListWrap" style="display:none;max-height:420px;overflow-y:auto">
+        <!-- Tabs Fran / Ju -->
+        <div style="display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:2;backdrop-filter:blur(16px)" id="filaTabs"></div>
+        <!-- List -->
+        <div id="filaList" style="padding:4px 0"></div>
+      </div>
+    </div>
+
     <div class="kanban" id="kanban">
       <div class="loading-cols"><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div><div class="loading-col"></div></div>
     </div>
@@ -328,13 +365,24 @@ async function loadBoard(id){
   boardData=data;renderKanban();
 }
 
+// ═══ COLUMN PRIORITY ORDER ═══
+const COL_PRIORITY={'perdid':1,'dorm':2,'risco':3,'fiel':4,'fi\u00e9':4,'vip':5,'reativ':6};
+function colOrder(nome){const n=nome.toLowerCase();for(const[k,v]of Object.entries(COL_PRIORITY)){if(n.includes(k))return v}return 99}
+
+// ═══ CARD SORT — extract dias from nota, sort descending (most urgent first) ═══
+function parseDias(nota){if(!nota)return 0;const m=nota.match(/(\d+)\s*dias/);return m?parseInt(m[1]):0}
+function sortCards(cards){return cards.sort((a,b)=>parseDias(b.nota)-parseDias(a.nota))}
+
 // ═══ RENDER KANBAN ═══
 function renderKanban(){
   const el=document.getElementById('kanban');el.innerHTML='';
   if(!boardData||!boardData.columns)return;
 
+  // Sort columns by priority: Perdidos → Dorm → Risco → Fiéis → VIPs
+  boardData.columns.sort((a,b)=>colOrder(a.nome)-colOrder(b.nome));
+
   boardData.columns.forEach(col=>{
-    const cards=col.cards||[];
+    const cards=sortCards(col.cards||[]);
     const colEl=document.createElement('div');colEl.className='kb-col';colEl.dataset.colId=col.id;
 
     // Drag events — use enter counter to handle nested elements
@@ -652,8 +700,109 @@ function showNewColumn(){
   }
 }
 
+// ═══ FILA DE DISPAROS ═══
+const BRD={1:{nome:'Fran',cor:'var(--wine)'},2:{nome:'Ju',cor:'var(--brown)'}};
+let filaData=null,filaTab=1,filaOpen=false;
+
+document.getElementById('filaToggle').addEventListener('click',()=>{
+  filaOpen=!filaOpen;
+  document.getElementById('filaListWrap').style.display=filaOpen?'block':'none';
+  document.getElementById('filaToggle').textContent=filaOpen?'Ocultar lista':'Mostrar lista';
+});
+
+async function loadFila(){
+  const{data,error}=await sb.rpc('dashboard_fila_disparos');
+  if(error||!data)return;
+  filaData=data;
+  const panel=document.getElementById('filaPanel');
+  panel.style.display='block';
+
+  const total=data.total||0,env=data.enviados||0,pend=data.pendentes||0;
+  const pct=total>0?Math.round((env/total)*100):0;
+
+  document.getElementById('filaSubtitle').textContent=env+' de '+total+' enviados';
+  document.getElementById('filaBar').style.width=pct+'%';
+  document.getElementById('filaPct').textContent=pct+'%';
+
+  const diasRest=Math.ceil(pend/(isVendedora?8:16));
+  document.getElementById('filaDias').textContent=pend>0?'~'+diasRest+' dias restantes':'Concluido!';
+
+  // Stats por board
+  const stats=document.getElementById('filaStats');stats.innerHTML='';
+  (data.por_board||[]).forEach(b=>{
+    if(isVendedora&&b.board_id!==user.board_id)return;
+    const info=BRD[b.board_id]||{nome:'Board '+b.board_id,cor:'var(--brown)'};
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:var(--r-pill);background:var(--surface);border:1px solid var(--border)';
+    const bPct=b.total>0?Math.round((b.enviados/b.total)*100):0;
+    d.innerHTML=
+      '<div style="width:6px;height:6px;border-radius:50%;background:'+info.cor+'"></div>'+
+      '<span style="font-size:.74rem;font-weight:600">'+info.nome+'</span>'+
+      '<span style="font-size:.66rem;color:var(--ok);font-weight:600">'+b.enviados+' enviados</span>'+
+      '<span style="font-size:.66rem;color:var(--txt3)">'+b.pendentes+' pendentes</span>'+
+      '<span style="font-size:.62rem;color:var(--txt3)">('+bPct+'%)</span>';
+    stats.appendChild(d);
+  });
+
+  renderFilaTabs();
+  renderFilaList();
+}
+
+function renderFilaTabs(){
+  const tabs=document.getElementById('filaTabs');tabs.innerHTML='';
+  const boardIds=isVendedora?[user.board_id]:[1,2];
+  boardIds.forEach(bid=>{
+    const info=BRD[bid]||{nome:'Board '+bid};
+    const btn=document.createElement('button');
+    btn.style.cssText='flex:1;padding:9px 16px;border:none;background:'+(filaTab===bid?'var(--card)':'transparent')+';font-family:var(--fb);font-size:.76rem;font-weight:'+(filaTab===bid?'600':'500')+';color:'+(filaTab===bid?'var(--brown)':'var(--txt3)')+';cursor:pointer;border-bottom:2px solid '+(filaTab===bid?'var(--brown)':'transparent')+';transition:all .2s';
+    btn.textContent=info.nome;
+    btn.addEventListener('click',()=>{filaTab=bid;renderFilaTabs();renderFilaList()});
+    tabs.appendChild(btn);
+  });
+}
+
+function renderFilaList(){
+  const list=document.getElementById('filaList');list.innerHTML='';
+  if(!filaData||!filaData.contatos)return;
+
+  const contatos=(filaData.contatos||[]).filter(c=>c.board_id===filaTab);
+  if(!contatos.length){list.innerHTML='<div style="padding:20px;text-align:center;font-size:.8rem;color:var(--txt3);font-style:italic">Nenhum contato nesta fila</div>';return}
+
+  contatos.forEach((c,i)=>{
+    const isEnv=c.status==='enviado';
+    const seg=c.segmento==='perdidos';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);transition:background .15s'+(isEnv?';opacity:.6':'');
+    if(i%2===0)row.style.background='rgba(155,122,90,0.03)';
+
+    const envTime=c.enviado_em?new Date(c.enviado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+
+    row.innerHTML=
+      // Status icon
+      '<div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;background:'+(isEnv?'var(--ok-s)':'var(--surface)')+';color:'+(isEnv?'var(--ok)':'var(--txt3)')+'">'+
+        (isEnv?'&#10003;':'&#9679;')+
+      '</div>'+
+      // Name + phone
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'+(isEnv?';text-decoration:line-through':'')+'">'+titleCase(c.nome_contato)+'</div>'+
+        '<div style="font-size:.64rem;color:var(--txt3)">'+c.telefone+'</div>'+
+      '</div>'+
+      // Segment badge
+      '<span style="padding:3px 8px;border-radius:10px;font-size:.6rem;font-weight:600;white-space:nowrap;background:'+(seg?'rgba(107,80,64,0.10)':'rgba(184,92,92,0.08)')+';color:'+(seg?'#6B5040':'#B85C5C')+'">'+(seg?'💀 Perdido':'😴 Dormentes')+'</span>'+
+      // Status
+      '<div style="text-align:right;min-width:70px">'+
+        (isEnv
+          ?'<div style="font-size:.64rem;font-weight:600;color:var(--ok)">Enviado</div><div style="font-size:.58rem;color:var(--txt3)">'+envTime+'</div>'
+          :'<div style="font-size:.64rem;font-weight:500;color:var(--txt3)">Na fila</div>'
+        )+
+      '</div>';
+    list.appendChild(row);
+  });
+}
+
 // ═══ INIT ═══
-renderBoardTabs();loadBoard(currentBoard);
+renderBoardTabs();loadBoard(currentBoard);loadFila();
+setInterval(loadFila,60000);
 </script>
 </body>
 </html>
